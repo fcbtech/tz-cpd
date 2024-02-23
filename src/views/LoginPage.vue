@@ -16,15 +16,30 @@
           </div>
         </v-col>
         <v-col cols="12">
-          <v-text-field v-model="firstname" :rules="nameRules" :counter="10" label="Tranzact UserID" required
+          <v-text-field v-model="userIdData" :rules="nameRules" :counter="10" label="Tranzact UserID" required
           hide-details></v-text-field>
         </v-col>
         <v-col cols="12">
-          <v-text-field v-model="lastname" :rules="nameRules" :counter="10" label="Tranzact Password" hide-details
-          required></v-text-field>
+          <v-text-field
+            v-model="passwordData"
+            :rules="nameRules"
+            :counter="10"
+            label="Tranzact Password"
+            required
+            type="password"
+          />
         </v-col>
         <v-col cols="12">
-          <v-btn type="submit" block class="text-white mt-2" style="background: #06AE6E;">Sign In</v-btn>
+          <v-btn
+            type="submit"
+            block
+            class="text-white mt-2"
+            style="background: #06AE6E;"
+            @click="loginSubmit"
+            @keyup.enter="loginSubmit"
+          >
+          Sign In
+        </v-btn>
         </v-col>
         <v-col cols="12" class="mt-3">
           <v-row class="d-flex justify-center align-center">
@@ -44,40 +59,69 @@
   </v-sheet>
 </template>
   
-<script>
+<script setup>
 import VButton from '../../../vuetify_001/src/components/VButton.vue';
+import { ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useProfileStore } from '@/piniaStore/common/auth/profile';
+
+const route = useRoute();
+const router = useRouter();
+const profileStore = useProfileStore();
+const submitLoginAction = profileStore.submitLoginAction;
+
+
 const publicPath = import.meta.env.BASE_URL;
-export default {
-  components: { VButton },
-  data: () => ({
-    valid: false,
-    firstname: '',
-    lastname: '',
-    nameRules: [
-      value => {
-        if (value) return true
+let showPassword = ref(false);
+let valid = false;
+let userIdData = ref('');
+let passwordData = ref('');
+let nameRules = [
+  value => {
+    if (value) return true
 
-        return 'Name is required.'
-      },
-      value => {
-        if (value?.length <= 10) return true
+    return 'Name is required.'
+  },
+  value => {
+    if (value?.length <= 10) return true
 
-        return 'Name must be less than 10 characters.'
-      },
-    ],
-    email: '',
-    emailRules: [
-      value => {
-        if (value) return true
+    return 'Name must be less than 10 characters.'
+  },
+];
 
-        return 'E-mail is requred.'
-      },
-      value => {
-        if (/.+@.+\..+/.test(value)) return true
+let components = { VButton };
+let email = '';
+let emailRules = [
+  value => {
+    if (value) return true
 
-        return 'E-mail must be valid.'
-      },
-    ],
-  }),
-}
+    return 'E-mail is requred.'
+  },
+  value => {
+    if (/.+@.+\..+/.test(value)) return true
+
+    return 'E-mail must be valid.'
+  },
+];
+
+const loginSubmit = async () => {
+  try {
+    console.log("DUBEY: ", userIdData.value + " " + passwordData.value);
+    const userDataPayload = {
+      userId: userIdData.value,
+      password: passwordData.value,
+    };
+
+    let loginResponse = await submitLoginAction(userDataPayload);
+
+    redirectLoginUser({
+      version: route.query.version,
+      onboardingStatus: loginResponse.payload.onboarding_status,
+      query: route.query,
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+};
 </script>
