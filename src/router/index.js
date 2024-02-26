@@ -4,9 +4,9 @@ import HelloWorld from '../components/HelloWorld.vue';
 
 const routes = [
     {
-        path: '/LoginPage',
-        name: 'LoginPage',
-        component: LoginPage
+        path: '/HelloWorld',
+        name: 'HelloWorld',
+        component: HelloWorld
     },
     {
         path: '/',

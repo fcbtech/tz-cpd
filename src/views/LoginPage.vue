@@ -16,14 +16,13 @@
           </div>
         </v-col>
         <v-col cols="12">
-          <v-text-field v-model="userIdData" :rules="nameRules" :counter="10" label="Tranzact UserID" required
-          hide-details></v-text-field>
+          <v-text-field v-model="emailData
+        " :rules="userIdRules" label="Tranzact UserID" required></v-text-field>
         </v-col>
         <v-col cols="12">
           <v-text-field
             v-model="passwordData"
-            :rules="nameRules"
-            :counter="10"
+            :rules="passwordRules"
             label="Tranzact Password"
             required
             type="password"
@@ -37,6 +36,7 @@
             style="background: #06AE6E;"
             @click="loginSubmit"
             @keyup.enter="loginSubmit"
+            :disabled="isDisabled"
           >
           Sign In
         </v-btn>
@@ -60,8 +60,7 @@
 </template>
   
 <script setup>
-import VButton from '../../../vuetify_001/src/components/VButton.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useProfileStore } from '@/piniaStore/common/auth/profile';
 
@@ -69,59 +68,54 @@ const route = useRoute();
 const router = useRouter();
 const profileStore = useProfileStore();
 const submitLoginAction = profileStore.submitLoginAction;
+const redirectLoginUser = profileStore.redirectLoginUser;
 
 
 const publicPath = import.meta.env.BASE_URL;
 let showPassword = ref(false);
 let valid = false;
-let userIdData = ref('');
+let emailData = ref('');
 let passwordData = ref('');
-let nameRules = [
+let userIdRules = [
   value => {
     if (value) return true
 
-    return 'Name is required.'
-  },
-  value => {
-    if (value?.length <= 10) return true
-
-    return 'Name must be less than 10 characters.'
-  },
+    return 'UserId is required.'
+  }
 ];
-
-let components = { VButton };
-let email = '';
-let emailRules = [
+let passwordRules = [
   value => {
     if (value) return true
 
-    return 'E-mail is requred.'
-  },
-  value => {
-    if (/.+@.+\..+/.test(value)) return true
-
-    return 'E-mail must be valid.'
-  },
+    return 'Password is required.'
+  }
 ];
+
 
 const loginSubmit = async () => {
   try {
-    console.log("DUBEY: ", userIdData.value + " " + passwordData.value);
+    console.log("DUBEY: ", emailData
+  .value + " " + passwordData.value);
     const userDataPayload = {
-      userId: userIdData.value,
+      email: emailData
+    .value,
       password: passwordData.value,
     };
 
     let loginResponse = await submitLoginAction(userDataPayload);
-
+    
     redirectLoginUser({
       version: route.query.version,
-      onboardingStatus: loginResponse.payload.onboarding_status,
       query: route.query,
     });
 
   } catch (error) {
-    console.log(error);
+    console.log('DUBEY ERROR: ', error);
   }
 };
+  const isDisabled = computed(() => {
+    return emailData
+  .value === '' || passwordData.value === ''
+  })
+
 </script>
