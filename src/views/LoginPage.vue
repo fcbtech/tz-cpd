@@ -104,10 +104,11 @@ const loginSubmit = async () => {
 
     let loginResponse = await submitLoginAction(userDataPayload);
     
-    redirectLoginUser({
-      version: route.query.version,
-      query: route.query,
-    });
+    // redirectLoginUser({
+    //   version: route.query.version,
+    //   query: route.query,
+    // });
+    redirectLoginUser();
 
   } catch (error) {
     console.log('DUBEY ERROR: ', error);
