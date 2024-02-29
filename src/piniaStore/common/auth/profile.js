@@ -9,31 +9,22 @@ import { setJWTTokensToLocalStorage, getJWTTokenFromLocalStorage } from '@/utils
 
 export const useProfileStore = defineStore('profile', () => {
   const submitLoginAction = async (payload) => {
-    // function to handle username/pwd login
 
-    // let response = await axiosPost('/main/login/password-login/', payload, {
-    //   unauthorized: true,
-    //   // baseUrl: config.baseUrl,
-    //   baseUrl: "arbitrary",
-    // });
-    let response = await axios.post('http://127.0.0.1:8001/main/login/password-login/', payload)
-    // .then((res) => {
+    try {
+      let response = await axios.post('http://127.0.0.1:8001/main/login/password-login/', payload)
 
-    //   console.log("Res.data ", JSON.stringify(res.data))
-    //   console.log("Res ", JSON.stringify(res))
-    //   // success = true
-    // }).catch((error) => {
-    //   // error = error.data.message
-    //   console.log('ERROR: ', error)
-    // })
 
-    console.log("Response: ", JSON.stringify(response));
+      console.log("Response: ", JSON.stringify(response));
 
-    setUserDetails(response);
-    return {
-      message: response.data.message,
-      data: response.data.data
-    };
+      setUserDetails(response);
+      return {
+        message: response.data.message,
+        data: response.data.data
+      };
+    } catch (error) {
+      console.log('Error in submitLoginAction: ', error)
+      throw error
+    }
   };
 
 
@@ -45,21 +36,11 @@ export const useProfileStore = defineStore('profile', () => {
   };
 
   const redirectLoginUser = async (payload) => {
-    // let { nextUrl = '/HelloWorld/' } = (payload.query ? payload.query : {});
+
     let nextUrl = '/HelloWorld';
 
-    // if (nextUrl.includes('/v2')) {
-    //   nextUrl = nextUrl.replace('/v2', '');
-    //   routerV2(nextUrl, payload.query);
-    // } else {
-    //   nextUrl = nextUrl.replace('/v3', '');
-    //   router.push(nextUrl);
-    // }
-
-    console.log("Redirecting user: ", nextUrl);
+    console.log("Redirecting login user: ", nextUrl);
     router.push(nextUrl)
-
-    console.log("Redirecting user");
   };
 
   return {

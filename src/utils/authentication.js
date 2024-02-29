@@ -1,4 +1,5 @@
 export const setJWTTokensToLocalStorage = (tokenType, token) => localStorage.setItem(tokenType, token);
+export const removeJWTTokensToLocalStorage = (tokenType) => localStorage.removeItem(tokenType);
 
 export const getJWTTokenFromLocalStorage = (tokenType = 'access_token') => localStorage.getItem(tokenType);
 
@@ -10,16 +11,23 @@ export const parseJwt = (token) => {
 
 export const isJWTTokenValid = (tokenType) => {
     console.log(tokenType)
-    const token = getJWTTokenFromLocalStorage(tokenType);
-    if (!token) return false;
-    const extractedToken = parseJwt(token);
-    const expirationTime = extractedToken.exp * 1000;
-    const timediff = expirationTime - Date.now();
-    console.log("TOKEN EXPIRY: ", tokenType + ' --- ' + timediff)
-    if (timediff <= 0) {
+    try {
+        const token = getJWTTokenFromLocalStorage(tokenType);
+        if (!token) return false;
+        const extractedToken = parseJwt(token);
+        console.log('PARSED TOKEN: \n', extractedToken)
+        const expirationTime = extractedToken.exp * 1000;
+        const timediff = expirationTime - Date.now();
+        console.log("TOKEN EXPIRY: ", tokenType + ' --- ' + timediff)
+        if (timediff <= 0) {
+            return false;
+        }
+        return token;
+    } catch (error) {
+        console.log(`Error in validating token ${tokenType}: ${error}`)
+        removeJWTTokensToLocalStorage(tokenType)
         return false;
     }
-    return token;
 };
 
 export const getRefreshToken = async (refreshToken) => {
@@ -29,5 +37,6 @@ export const getRefreshToken = async (refreshToken) => {
         console.log('Error in refreshing token: ', error)
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        return false;
     }
 }
