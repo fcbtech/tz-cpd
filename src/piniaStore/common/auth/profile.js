@@ -37,7 +37,7 @@ export const useProfileStore = defineStore('profile', () => {
 
   const redirectLoginUser = async (payload) => {
 
-    let nextUrl = '/HelloWorld';
+    let nextUrl = '/HomePage';
 
     console.log("Redirecting login user: ", nextUrl);
     router.push(nextUrl)
