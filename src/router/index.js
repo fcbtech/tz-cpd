@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import LoginPage from '../views/LoginPage.vue';
+import HomePage from '../views/HomePage.vue';
 import { useProfileStore } from '@/piniaStore/common/auth/profile'
 import HelloWorld from '../components/HelloWorld.vue';
 import { isJWTTokenValid, getRefreshToken, setJWTTokensToLocalStorage, removeJWTTokensToLocalStorage } from '@/utils/authentication';
@@ -15,6 +16,11 @@ const routes = [
         path: '/',
         name: 'LoginPage',
         component: LoginPage
+    },
+    {
+        path: '/HomePage',
+        name: 'HomePage',
+        component: HomePage
     }
 ]
 const fetchNewAccessToken = async (refreshToken) => {
