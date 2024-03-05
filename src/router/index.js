@@ -30,8 +30,10 @@ const fetchNewAccessToken = async (refreshToken) => {
         let fetchedAccessToken = await getRefreshToken({ refresh_token: refreshToken });
 
         if (fetchedAccessToken) {
+            console.log('Fetched Token: ', fetchedAccessToken)
             setJWTTokensToLocalStorage('access_token', fetchNewAccessToken)
         } else {
+            console.log('Could not fetch Token: ', fetchedAccessToken)
             removeJWTTokensToLocalStorage('refresh_token')
             removeJWTTokensToLocalStorage('access_token')
         }

@@ -1,3 +1,6 @@
+import Constants from '@/utils/constants'
+import axios from 'axios';
+
 export const setJWTTokensToLocalStorage = (tokenType, token) => localStorage.setItem(tokenType, token);
 export const removeJWTTokensToLocalStorage = (tokenType) => localStorage.removeItem(tokenType);
 
@@ -32,7 +35,8 @@ export const isJWTTokenValid = (tokenType) => {
 
 export const getRefreshToken = async (refreshToken) => {
     try {
-        return async () => await axios.post("http://127.0.0.1:8001/main/login/api-token-refresh/", refreshToken);
+        const fetchedTokenResponse = await axios.post("http://127.0.0.1:8001/main/login/api-token-refresh/", refreshToken);
+        return fetchedTokenResponse.data[Constants.ACCESS_TOKEN];
     } catch (error) {
         console.log('Error in refreshing token: ', error)
         localStorage.removeItem('access_token');
