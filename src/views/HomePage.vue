@@ -4,7 +4,25 @@
       <NavBar />
     </div>
     <div style="margin-top:100px;">
-      <v-data-table :headers="headers" :items="desserts" :sort-by="[{ key: 'calories', order: 'asc' }]">
+      <v-text-field
+        v-model="search"
+        label="Search"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        hide-details
+        single-line
+      ></v-text-field>
+      <v-data-table :search="search" :headers="headers" :items="desserts" :sort-by="[{ key: 'calories', order: 'asc' }]">
+        <!-- <template v-slot:text>
+          <v-text-field
+            v-model="search"
+            label="Search"
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
+            hide-details
+            single-line
+          ></v-text-field>
+        </template> -->
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>My CRUD</v-toolbar-title>
@@ -124,6 +142,7 @@ export default {
         )
       },
     ],
+    search: '',
     dialog: false,
     dialogDelete: false,
     dialogUpload: false,
