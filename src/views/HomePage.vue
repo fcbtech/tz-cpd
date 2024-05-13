@@ -90,7 +90,11 @@
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
-          <v-icon class="me-2" size="small" @click="editItem(item)">
+          <!-- TODO: show 'Create Deal' button for Data Team -->
+          <v-btn class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="uploadExcel">
+            Create Deal
+          </v-btn>
+          <v-icon class="me-2" size="x-small" @click="editItem(item)">
             mdi-pencil
           </v-icon>
           <!-- <v-icon size="small" @click="deleteItem(item)">
