@@ -67,8 +67,14 @@ router.beforeEach(async (to, from, next) => {
     const isAuthenticated = await checkAuthentication();
     console.log('IsAuthenticated: ', isAuthenticated)
     if (isAuthenticated) {
-        console.log('Rerouting to : ', to.fullPath)
-        next()
+
+        if(to.name === 'LoginPage') {
+            console.log('Rerouting to : HomePage')
+            next({ name: 'HomePage' })
+        } else {
+            console.log('Rerouting to : ', to.fullPath)
+            next()
+        }
     }
 
     else if (to.name !== 'LoginPage') {
