@@ -22,16 +22,16 @@
                         <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="4" sm="6">
-                        <v-text-field v-model="editedItem.calories" label="Calories"></v-text-field>
+                        <v-text-field v-model.number="editedItem.calories" label="Calories"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="4" sm="6">
-                        <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
+                        <v-text-field v-model.number="editedItem.fat" label="Fat (g)"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="4" sm="6">
-                        <v-text-field v-model="editedItem.carbs" label="Carbs (g)"></v-text-field>
+                        <v-text-field v-model.number="editedItem.carbs" label="Carbs (g)"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="4" sm="6">
-                        <v-text-field v-model="editedItem.protein" label="Protein (g)"></v-text-field>
+                        <v-text-field v-model.number="editedItem.protein" label="Protein (g)"></v-text-field>
                       </v-col>
                     </v-row>
                   </v-container>
@@ -256,6 +256,7 @@ export default {
     editItem(item) {
       this.editedIndex = this.desserts.indexOf(item)
       this.editedItem = Object.assign({}, item)
+      console.log('DUBEY: editedItem before save: ', this.editedItem)
       this.dialog = true
     },
 
@@ -288,7 +289,9 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
+        console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
         Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
       } else {
         this.desserts.push(this.editedItem)
       }
@@ -306,6 +309,7 @@ export default {
       console.log('DUBEY: length uploaded file: ', this.uploadedFile.length)
       //TODO: Trigger API for adding data to database and 
       //get the data for fields not added
+      this.closeUpload();
     }
   },
 }
