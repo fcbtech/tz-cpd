@@ -80,7 +80,8 @@
                   <v-btn color="blue-darken-1" variant="text" @click="closeUpload">
                     Cancel
                   </v-btn>
-                  <v-btn color="blue-darken-1" variant="text" @click="uploadExcel">
+                  <v-btn color="blue-darken-1" variant="text" @click="uploadExcel" :disabled="isDisabled"
+>
                     Upload to Database
                   </v-btn>
                 </v-card-actions>
@@ -158,6 +159,9 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
     },
+    isDisabled() {
+      return this.uploadedFile.length === 0;
+    }
   },
 
   watch: {
@@ -293,11 +297,13 @@ export default {
 
     closeUpload() {
       this.dialogUpload = false
+      console.log('DUBEY: closeUpload() uploaded file: ', this.uploadedFile)
     },
 
     uploadExcel() {
       console.log("Dubey uploading excel file")
       console.log('DUBEY: uploaded file: ', this.uploadedFile)
+      console.log('DUBEY: length uploaded file: ', this.uploadedFile.length)
       //TODO: Trigger API for adding data to database and 
       //get the data for fields not added
     }
