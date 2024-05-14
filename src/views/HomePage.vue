@@ -4,7 +4,40 @@
       <NavBar />
     </div>
     <div style="margin-top:100px;">
-      <v-data-table :headers="headers" :items="desserts" :sort-by="[{ key: 'calories', order: 'asc' }]">
+      <v-text-field
+        v-model="search"
+        label="Search"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        hide-details
+        single-line
+      ></v-text-field>
+      <v-data-table item-key="name" :search="search" :headers="headers" :items="filteredData" :sort-by="[{ key: 'calories', order: 'asc' }]">
+        <template
+            v-for="(header, i) in headers.slice(0, 5)"
+            v-slot:[`header.${header.key}`]="{ }"
+          >
+            {{ header.title }}
+            <div @click.stop :key="i">
+              <v-text-field
+                :key="i"
+                v-model="multiSearch[header.key]"
+                class="text-capitalize pa"
+                type="text"
+                :placeholder="header.key.charAt(0).toUpperCase() + header.key.slice(1)"
+              ></v-text-field>
+            </div>
+        </template>
+        <!-- <template v-slot:text>
+          <v-text-field
+            v-model="search"
+            label="Search"
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
+            hide-details
+            single-line
+          ></v-text-field>
+        </template> -->
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>My CRUD</v-toolbar-title>
@@ -124,6 +157,8 @@ export default {
         )
       },
     ],
+    multiSearch: {},
+    search: '',
     dialog: false,
     dialogDelete: false,
     dialogUpload: false,
@@ -160,6 +195,51 @@ export default {
   }),
 
   computed: {
+    filteredData() {
+        if (this.multiSearch) {
+            return this.desserts.filter((item) => {
+                return Object.entries(this.multiSearch).every(([key, value]) => {
+                    if (value.includes("|") && !value.includes("!")) {
+                        let el = value.split("|");
+                        return el.some((elem) =>
+                            (item[key] || "").toString().toUpperCase().startsWith(elem.toString().toUpperCase())
+                        );
+                    }
+                    if (value.substring(0, 1) === "!" && !value.includes("|")) {
+                        let el = value.split("!");
+                        return el.some((elem) =>
+                            !(item[key] || "").toString().toUpperCase().startsWith(elem.toString().toUpperCase())
+                        );
+                    }
+                    if (value.includes("|") && value.substring(0, 1) === "!") {
+                        let el = value.split("!")[1].split("|");
+                        return !el.some((elem) =>
+                            (item[key] || "").toString().toUpperCase().startsWith(elem.toString().toUpperCase())
+                        );
+                    }
+                    if (value.substring(0, 1) === ">") {
+                        let el = value.split(">");
+                        if (item[key] !== " ") {
+                          return Number(item[key] || "") > el[1];
+                        }
+                    }
+                    if (value.substring(0, 1) === "<") {
+                        let el = value.split("<");
+                        if (item[key] !== " ") {
+                          return Number(item[key] || "") < el[1];
+                        }
+                    }
+                    if (value.substring(0, 1) === "=") {
+                        let el = value.split("=");
+                        return (item[key] || "").toString().toUpperCase() === el[1].toString().toUpperCase();
+                    }
+                    return (item[key] || "").toString().toUpperCase().includes(value.toString().toUpperCase());
+                });
+            });
+        } else {
+        return this.desserts;
+        }
+    },
     formTitle() {
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
     },
