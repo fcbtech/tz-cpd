@@ -116,7 +116,7 @@ const loginSubmit = async () => {
     console.info("DUBEY RESPONSE: ", loginResponse);
     if (loginResponse.message !== '') {
       console.info("DUBEY RESPONSE MESSAGE: ", loginResponse.message);
-      loginError.value = loginResponse.message
+      loginError.value = 'The Login ID and Password are incorrect'
       snackbar.value = true
     }
     redirectLoginUser();
