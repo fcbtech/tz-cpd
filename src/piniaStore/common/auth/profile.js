@@ -9,7 +9,7 @@ export const useProfileStore = defineStore('profile', () => {
   const submitLoginAction = async (payload) => {
 
     try {
-      let response = await axios.post('https://be.letstranzact.com/main/login/password-login/', payload)
+      let response = await axios.post('http://127.0.0.1:8001//main/login/password-login/', payload)
 
 
       console.log("Response: ", JSON.stringify(response));
