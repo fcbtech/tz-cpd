@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import LoginPage from '../views/LoginPage.vue';
 import HomePage from '../views/HomePage.vue';
-import { useProfileStore } from '@/piniaStore/common/auth/profile'
 import HelloWorld from '../components/HelloWorld.vue';
+import { useProfileStore } from '@/piniaStore/common/auth/profile'
 import { isJWTTokenValid, getRefreshToken, setJWTTokensToLocalStorage, removeJWTTokensToLocalStorage } from '@/utils/authentication';
 import { ref } from "vue";
 
@@ -63,10 +63,11 @@ async function checkAuthentication() {
 
     return false;
 }
+
 const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
+    history: createWebHashHistory(),
     routes
-})
+});
 
 router.beforeEach(async (to, from, next) => {
     // ...
