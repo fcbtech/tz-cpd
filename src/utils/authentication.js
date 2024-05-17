@@ -44,3 +44,44 @@ export const getRefreshToken = async (refreshToken) => {
         return false;
     }
 }
+
+const fetchNewAccessToken = async (refreshToken) => {
+    try {
+        console.log('Refreshing token...');
+        localStorage.removeItem('access_token');
+        let fetchedAccessToken = await getRefreshToken({ refresh_token: refreshToken });
+
+        if (fetchedAccessToken) {
+            console.log('Fetched Token: ', fetchedAccessToken)
+            setJWTTokensToLocalStorage('access_token', fetchedAccessToken)
+        } else {
+            console.log('Could not fetch Token: ', fetchedAccessToken)
+            removeJWTTokensToLocalStorage('refresh_token')
+            removeJWTTokensToLocalStorage('access_token')
+        }
+    } catch {
+        // localStorage.removeItem('refresh_token');
+        throw new Error('There was an error refreshing the token');
+    }
+};
+
+export const checkAuthentication = async () => {
+    console.log('Rerouting...')
+    // localStorage.removeItem('access_token')
+    // localStorage.removeItem('refres_token')
+    const accessToken = isJWTTokenValid('access_token')
+    const refreshToken = isJWTTokenValid('refresh_token')
+    console.log('AccessToken: ', accessToken)
+    console.log('RefreshToken: ', refreshToken)
+
+    if (accessToken) {
+        return true;
+    }
+
+    if (refreshToken) {
+        await fetchNewAccessToken(refreshToken)
+        return true;
+    }
+
+    return false;
+}
