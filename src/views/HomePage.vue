@@ -152,6 +152,8 @@
 
 <script>
 import axios from 'axios';
+import { checkAuthentication, getJWTTokenFromLocalStorage } from '@/utils/authentication'
+import router from '@/router'
 
 export default {
   data: () => ({
@@ -302,12 +304,24 @@ export default {
 
     },
     async initialize() {
-      const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd/get-prospect");
+      const isAuthenticated = await checkAuthentication()
+      if(!isAuthenticated) {
+        router.push('/')
+        return;
+      }
+      let config = {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
+        },
+      };
+      const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd/get-prospect", config);
       console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
       this.desserts = fetchedTokenResponse.data.data;
     },
 
     editItem(item) {
+      console.log('DUBEY: desserts: ', this.desserts)
       this.editedIndex = this.desserts.indexOf(item)
       this.editedItem = Object.assign({}, item)
       console.log('DUBEY: editedItem before save: ', this.editedItem)
@@ -341,15 +355,18 @@ export default {
       })
     },
 
-    save() {
+    async save() {
+      this.close()
       if (this.editedIndex > -1) {
         console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
         Object.assign(this.desserts[this.editedIndex], this.editedItem)
         console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
+        await this.updateProspectinDB(this.desserts[this.editedIndex])
+        await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
+        await this.initialize()
       } else {
         this.desserts.push(this.editedItem)
       }
-      this.close()
     },
 
     closeUpload() {
@@ -364,6 +381,23 @@ export default {
       //TODO: Trigger API for adding data to database and 
       //get the data for fields not added
       this.closeUpload();
+    },
+    async updateProspectinDB(enrichedProspect) {
+      const isAuthenticated = await checkAuthentication()
+      if(!isAuthenticated) {
+        router.push('/')
+        return;
+      }
+      let config = {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
+        },
+      };
+      const payload = [enrichedProspect]
+      const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/enrich", payload, config);
+      console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
+      // this.desserts = fetchedTokenResponse.data.data;
     }
   },
 }
