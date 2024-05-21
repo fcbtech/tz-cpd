@@ -3,6 +3,10 @@
     <div>
       <NavBar />
     </div>
+    <!-- <SnackBar :snack-bar="snackbar" message-text="SOME ERROR" /> -->
+    <!-- <v-snackbar v-model="snackbar" :timeout="timeout" color="red-lighten-3">
+      'Error '
+    </v-snackbar> -->
     <div style="margin-top:100px;">
       <!-- <v-text-field
         v-model="search"
@@ -12,12 +16,12 @@
         hide-details
         single-line
       ></v-text-field> -->
-      <v-data-table hover fixed-header height="500" density="compact" item-key="name" :search="search" :headers="headers" :items="filteredData" :sort-by="[{ key: 'calories', order: 'asc' }]">
+      <v-data-table hover fixed-header height="500" density="compact" item-key="name" :search="search" :headers="headers" :items="filteredData" :sort-by="[{ key: 'company_name', order: 'asc' }]">
         <template
-          v-for="(header, i) in headers.slice(0, headers.length - 1)"
+          v-for="(header, i) in headers.slice(1, headers.length)"
           v-slot:[`header.${header.key}`]="{ }"
         >
-        <span class="text-h5">
+        <span>
           {{ header.title }}
         </span>
           <div @click.stop :key="i">
@@ -54,7 +58,7 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
-                      <v-col  cols="12" md="3" sm="6" v-for="(header) in headers.slice(0, headers.length-1)">
+                      <v-col  cols="12" md="3" sm="6" v-for="(header) in headers.slice(1, headers.length)">
                         <v-text-field v-model="editedItem[header.key]" :label="header.title" />
                       </v-col>
                       <!-- <v-col cols="12" md="4" sm="6">
@@ -110,7 +114,7 @@
                 </v-card-title>
 
                 <v-card-text>
-                  <v-file-input v-model="uploadedFile" :rules="rules" accept=".xlsx, text/csv" label="Upload excel file"
+                  <v-file-input @change="handleFileUpload" accept=".xlsx" :rules="rules"  label="Upload excel file"
                     placeholder="Pick AYUSHSHHH" prepend-icon="mdi-camera"></v-file-input>
                 </v-card-text>
 
@@ -154,9 +158,13 @@
 import axios from 'axios';
 import { checkAuthentication, getJWTTokenFromLocalStorage } from '@/utils/authentication'
 import router from '@/router'
+import * as XLSX from 'xlsx';
+
 
 export default {
   data: () => ({
+    snackbar: false,
+    timeout: 5000,
     rules: [
       value => {
         return (
@@ -174,6 +182,8 @@ export default {
     dialogUpload: false,
     uploadedFile: [],
     headers: [
+    { title: 'Actions', key: 'actions', sortable: false, align:'center',
+      fixed: true, minWidth: '200', nowrap: true  },
       {
         title: 'Company Name',
         align: 'start',
@@ -212,10 +222,7 @@ export default {
       { title: 'Deal ID', key: 'hb_deal_id',
         minWidth: '200' },
       { title: 'Deal Creation Date', key: 'hb_deal_creation_date',
-        minWidth: '200' },
-
-      { title: 'Actions', key: 'actions', sortable: false,
-      fixed: true, minWidth: '200', pinned: 'right',  },
+        minWidth: '200' }
     ],
     desserts: [],
     editedIndex: -1,
@@ -373,14 +380,55 @@ export default {
       this.dialogUpload = false
       console.log('DUBEY: closeUpload() uploaded file: ', this.uploadedFile)
     },
-
-    uploadExcel() {
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        this.uploadedFile = XLSX.utils.sheet_to_json(worksheet);
+        console.log("Converted JSON:", this.uploadedFile);
+      };
+      reader.readAsArrayBuffer(file);
+    },
+    async uploadExcel() {
       console.log("Dubey uploading excel file")
       console.log('DUBEY: uploaded file: ', this.uploadedFile)
       console.log('DUBEY: length uploaded file: ', this.uploadedFile.length)
       //TODO: Trigger API for adding data to database and 
       //get the data for fields not added
       this.closeUpload();
+
+
+      try {
+        const isAuthenticated = await checkAuthentication()
+        if(!isAuthenticated) {
+          router.push('/')
+          return;
+        }
+        let config = {
+          api: {
+            bodyParser: false
+          },
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`
+          },
+        };
+        // const formData = new FormData();
+        // formData.append('excelFile', this.uploadedFile);
+        // const payload = formData
+        const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/bulk-create", this.uploadedFile, config);
+
+      } catch(error) {
+
+        this.snackbar = true
+
+      }
+
+      this.uploadedFile = []
     },
     async updateProspectinDB(enrichedProspect) {
       const isAuthenticated = await checkAuthentication()

@@ -13,7 +13,8 @@
     "roboto-fontface": "*",
     "vue": "^3.3.0",
     "vue-router": "^4.2.5",
-    "vuetify": "^3.0.0"
+    "vuetify": "^3.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",
