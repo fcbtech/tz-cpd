@@ -228,6 +228,13 @@ export default {
     editedIndex: -1,
     editedItem: {},
     defaultItem: {},
+    uploadedExcelFile: null,
+    apiResponse: [
+        // Example API response data structure
+        { rowNumber: 2, invalidMessage: 'Invalid email address' },
+        { rowNumber: 5, invalidMessage: 'Missing phone number' }
+        // Add more rows as needed
+      ]
   }),
 
   computed: {
@@ -323,7 +330,7 @@ export default {
         },
       };
       const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd/get-prospect", config);
-      console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
+      // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
       this.desserts = fetchedTokenResponse.data.data;
     },
 
@@ -382,6 +389,7 @@ export default {
     },
     handleFileUpload(event) {
       const file = event.target.files[0];
+      this.uploadedExcelFile = file
       const reader = new FileReader();
       reader.onload = (e) => {
         const data = new Uint8Array(e.target.result);
@@ -420,8 +428,10 @@ export default {
         // const formData = new FormData();
         // formData.append('excelFile', this.uploadedFile);
         // const payload = formData
-        const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/bulk-create", this.uploadedFile, config);
-
+        const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/bulk-insert", this.uploadedFile, config);
+        console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse.data.data))
+        this.apiResponse = fetchedTokenResponse.data.data
+        this.downloadErrorExcel()
       } catch(error) {
 
         this.snackbar = true
@@ -429,6 +439,59 @@ export default {
       }
 
       this.uploadedFile = []
+    },
+
+    async downloadErrorExcel () {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert the worksheet to JSON for easier manipulation
+        const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        // Add new columns headers if they don't exist
+        if (sheetData[0].indexOf('invalid') === -1) {
+          sheetData[0].push('invalid', 'invalidMessage');
+        }
+
+        // Add invalid and invalidMessage to the corresponding rows
+        this.apiResponse.forEach(({ rowNumber, invalidMessage }) => {
+          if (sheetData[rowNumber]) {
+            // Ensure the row has enough columns to accommodate new data
+            sheetData[rowNumber][sheetData[0].length - 2] = true;
+            sheetData[rowNumber][sheetData[0].length - 1] = invalidMessage;
+          }
+        });
+
+        // Convert the updated JSON back to worksheet
+        const updatedWorksheet = XLSX.utils.aoa_to_sheet(sheetData);
+
+        // Update the worksheet in the workbook
+        workbook.Sheets[firstSheetName] = updatedWorksheet;
+
+        // Create a new Excel file and trigger download
+        const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
+        const blob = new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' });
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'updated_file.xlsx';
+        link.click();
+      };
+
+      reader.readAsArrayBuffer(this.uploadedExcelFile);
+    },
+    s2ab(s) {
+      const buf = new ArrayBuffer(s.length);
+      const view = new Uint8Array(buf);
+      for (let i = 0; i < s.length; i++) {
+        view[i] = s.charCodeAt(i) & 0xff;
+      }
+      return buf;
     },
     async updateProspectinDB(enrichedProspect) {
       const isAuthenticated = await checkAuthentication()
