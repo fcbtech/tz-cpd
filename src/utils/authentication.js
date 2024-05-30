@@ -35,7 +35,7 @@ export const isJWTTokenValid = (tokenType) => {
 
 export const getRefreshToken = async (refreshToken) => {
     try {
-        const fetchedTokenResponse = await axios.post("http://127.0.0.1:8001/main/login/api-token-refresh/", refreshToken);
+        const fetchedTokenResponse = await axios.post("https://be.letstranzact.com/main/login/api-token-refresh/", refreshToken);
         return fetchedTokenResponse.data[Constants.ACCESS_TOKEN];
     } catch (error) {
         console.log('Error in refreshing token: ', error)
