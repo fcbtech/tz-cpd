@@ -329,16 +329,17 @@ export default {
           Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
         },
       };
+      // const fetchedTokenResponse = await axios.get("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/get-prospect", config);
       const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd/get-prospect", config);
       // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
       this.desserts = fetchedTokenResponse.data.data;
     },
 
     editItem(item) {
-      console.log('DUBEY: desserts: ', this.desserts)
+      // console.log('DUBEY: desserts: ', this.desserts)
       this.editedIndex = this.desserts.indexOf(item)
       this.editedItem = Object.assign({}, item)
-      console.log('DUBEY: editedItem before save: ', this.editedItem)
+      // console.log('DUBEY: editedItem before save: ', this.editedItem)
       this.dialog = true
     },
 
@@ -372,12 +373,14 @@ export default {
     async save() {
       this.close()
       if (this.editedIndex > -1) {
-        console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
+        // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
         Object.assign(this.desserts[this.editedIndex], this.editedItem)
-        console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
+        // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
         await this.updateProspectinDB(this.desserts[this.editedIndex])
         await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
+        console.log('Calling initialize')
         await this.initialize()
+        console.log('Calling initialize Done')
       } else {
         this.desserts.push(this.editedItem)
       }
@@ -428,10 +431,13 @@ export default {
         // const formData = new FormData();
         // formData.append('excelFile', this.uploadedFile);
         // const payload = formData
-        const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/bulk-insert", this.uploadedFile, config);
-        console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse.data.data))
+        // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", this.uploadedFile, config);
+        const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd-api/tz-cpd/bulk-insert", config);
+        // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse.data.data))
         this.apiResponse = fetchedTokenResponse.data.data
-        this.downloadErrorExcel()
+        if(fetchedTokenResponse.data.code === 'insert_partial') {
+          this.downloadErrorExcel()
+        }
       } catch(error) {
 
         this.snackbar = true
@@ -462,7 +468,7 @@ export default {
         this.apiResponse.forEach(({ rowNumber, invalidMessage }) => {
           if (sheetData[rowNumber]) {
             // Ensure the row has enough columns to accommodate new data
-            sheetData[rowNumber][sheetData[0].length - 2] = true;
+            sheetData[rowNumber][sheetData[0].length - 2] = 'true';
             sheetData[rowNumber][sheetData[0].length - 1] = invalidMessage;
           }
         });
@@ -506,6 +512,7 @@ export default {
         },
       };
       const payload = [enrichedProspect]
+      // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
       const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/enrich", payload, config);
       console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
       // this.desserts = fetchedTokenResponse.data.data;
