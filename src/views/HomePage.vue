@@ -134,7 +134,7 @@
         </template>
         <template v-slot:item.actions="{ item }">
           <!-- TODO: show 'Create Deal' button for Data Team -->
-          <v-btn class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="uploadExcel">
+          <v-btn class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="createDeal(item)">
             Create Deal
           </v-btn>
           <v-icon class="me-2" size="x-small" @click="editItem(item)">
@@ -514,6 +514,24 @@ export default {
       const payload = [enrichedProspect]
       // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
       const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/enrich", payload, config);
+      // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
+      // this.desserts = fetchedTokenResponse.data.data;
+    },
+    async createDeal(prospect) {
+      const isAuthenticated = await checkAuthentication()
+      if(!isAuthenticated) {
+        router.push('/')
+        return;
+      }
+      let config = {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
+        },
+      };
+      const payload = [prospect]
+      // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
+      const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/create-deal", payload, config);
       console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
       // this.desserts = fetchedTokenResponse.data.data;
     }
