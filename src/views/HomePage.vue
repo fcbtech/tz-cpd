@@ -3,7 +3,13 @@
     <div>
       <NavBar :userType="userType" />
     </div>
-    <!-- <SnackBar :snack-bar="snackbar" message-text="SOME ERROR" /> -->
+    <!-- <SnackBar :snackbar-prop="snackbar" bar-color="red-darken-1" message-text="SOME ERROR" /> -->
+    <v-snackbar v-model="snackbar" :timeout="timeout" color="red-lighten-3">
+      {{  snackbarMessage }}
+    </v-snackbar>
+    <v-btn v-if="desserts.length === 0 && !isLoading" class="allot-data-btn" color="primary" @click="initialize">
+      Allot Data
+    </v-btn>
     <!-- <v-snackbar v-model="snackbar" :timeout="timeout" color="red-lighten-3">
       'Error '
     </v-snackbar> -->
@@ -106,9 +112,9 @@
             </v-dialog>
             <v-dialog v-model="dialogUpload" max-width="800px">
               <template v-slot:activator="{ props }">
-                <v-btn class="mb-2" color="primary" dark v-bind="props">
+                <!-- <v-btn class="mb-2" color="primary" dark v-bind="props">
                   Bulk Upload (Create/Update)
-                </v-btn>
+                </v-btn> -->
               </template>
               <v-card>
                 <v-card-title class="text-center">
@@ -125,8 +131,7 @@
                   <v-btn color="blue-darken-1" variant="text" @click="closeUpload">
                     Cancel
                   </v-btn>
-                  <v-btn color="blue-darken-1" variant="text" @click="uploadExcel" :disabled="isDisabled"
->
+                  <v-btn color="blue-darken-1" variant="text" @click="uploadExcel" :disabled="isDisabled">
                     Upload to Database
                   </v-btn>
                 </v-card-actions>
@@ -152,11 +157,11 @@
             mdi-delete
           </v-icon> -->
         </template>
-        <template v-slot:no-data>
+        <!-- <template v-slot:no-data>
           <v-btn color="primary" @click="initialize">
             Allot Data
           </v-btn>
-        </template>
+        </template> -->
       </v-data-table>
     </div>
   </div>
@@ -174,6 +179,7 @@ export default {
     isLoading: false,
     userType: '',
     snackbar: false,
+    snackbarMessage: 'Something Went Wrong',
     timeout: 5000,
     rules: [
       value => {
@@ -312,7 +318,7 @@ export default {
 
   created() {
     this.initialiseEditedItem()
-    this.initialize()
+    // this.initialize()
   },
 
   methods: {
@@ -538,23 +544,47 @@ export default {
       // this.desserts = fetchedTokenResponse.data.data;
     },
     async createDeal(prospect) {
-      const isAuthenticated = await checkAuthentication()
-      if(!isAuthenticated) {
-        router.push('/')
-        return;
+      try {
+        const isAuthenticated = await checkAuthentication()
+        if(!isAuthenticated) {
+          router.push('/')
+          return;
+        }
+        let config = {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
+          },
+        };
+        const payload = [prospect]
+        // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
+        this.snackbar = true
+        const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/create-deal", payload, config);
+        console.log('DUBEY createDeal: ', JSON.stringify(fetchedTokenResponse))
+        // this.desserts = fetchedTokenResponse.data.data;
+      } catch(error) {
+        this.snackbar = true
+        this.snackbarMessage = 'Error in Creating Deal'
+        console.log('Error in creating deal', error)
       }
-      let config = {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
-        },
-      };
-      const payload = [prospect]
-      // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
-      const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/create-deal", payload, config);
-      console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
-      // this.desserts = fetchedTokenResponse.data.data;
     }
   },
 }
 </script>
+<style scoped>
+.allot-data {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  /* background: rgba(255, 255, 255, 0.8); */
+  /* padding-top: 200px; */
+  /* font-size: 30px; */
+}
+
+.allot-data-btn {
+  position: fixed;
+  top: 50%;
+  left: 45%;
+  z-index: 9999;
+}
+</style>
