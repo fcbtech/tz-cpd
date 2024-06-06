@@ -397,9 +397,9 @@ export default {
         // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
         await this.updateProspectinDB(this.desserts[this.editedIndex])
         await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
-        console.log('Calling initialize')
+        // console.log('Calling initialize')
         await this.initialize()
-        console.log('Calling initialize Done')
+        // console.log('Calling initialize Done')
       } else {
         this.desserts.push(this.editedItem)
       }
@@ -408,7 +408,7 @@ export default {
 
     closeUpload() {
       this.dialogUpload = false
-      console.log('DUBEY: closeUpload() uploaded file: ', this.uploadedFile)
+      // console.log('DUBEY: closeUpload() uploaded file: ', this.uploadedFile)
     },
     handleFileUpload(event) {
       const file = event.target.files[0];
@@ -420,14 +420,14 @@ export default {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         this.uploadedFile = XLSX.utils.sheet_to_json(worksheet);
-        console.log("Converted JSON:", this.uploadedFile);
+        // console.log("Converted JSON:", this.uploadedFile);
       };
       reader.readAsArrayBuffer(file);
     },
     async uploadExcel() {
-      console.log("Dubey uploading excel file")
-      console.log('DUBEY: uploaded file: ', this.uploadedFile)
-      console.log('DUBEY: length uploaded file: ', this.uploadedFile.length)
+      // console.log("Dubey uploading excel file")
+      // console.log('DUBEY: uploaded file: ', this.uploadedFile)
+      // console.log('DUBEY: length uploaded file: ', this.uploadedFile.length)
       //TODO: Trigger API for adding data to database and 
       //get the data for fields not added
       this.closeUpload();

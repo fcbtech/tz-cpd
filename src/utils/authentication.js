@@ -13,15 +13,15 @@ export const parseJwt = (token) => {
 };
 
 export const isJWTTokenValid = (tokenType) => {
-    console.log(tokenType)
+    // console.log(tokenType)
     try {
         const token = getJWTTokenFromLocalStorage(tokenType);
         if (!token) return false;
         const extractedToken = parseJwt(token);
-        console.log('PARSED TOKEN: \n', extractedToken)
+        // console.log('PARSED TOKEN: \n', extractedToken)
         const expirationTime = extractedToken.exp * 1000;
         const timediff = expirationTime - Date.now();
-        console.log("TOKEN EXPIRY: ", tokenType + ' --- ' + timediff)
+        // console.log("TOKEN EXPIRY: ", tokenType + ' --- ' + timediff)
         if (timediff <= 0) {
             return false;
         }
@@ -47,15 +47,15 @@ export const getRefreshToken = async (refreshToken) => {
 
 const fetchNewAccessToken = async (refreshToken) => {
     try {
-        console.log('Refreshing token...');
+        // console.log('Refreshing token...');
         localStorage.removeItem('access_token');
         let fetchedAccessToken = await getRefreshToken({ refresh_token: refreshToken });
 
         if (fetchedAccessToken) {
-            console.log('Fetched Token: ', fetchedAccessToken)
+            // console.log('Fetched Token: ', fetchedAccessToken)
             setJWTTokensToLocalStorage('access_token', fetchedAccessToken)
         } else {
-            console.log('Could not fetch Token: ', fetchedAccessToken)
+            // console.log('Could not fetch Token: ', fetchedAccessToken)
             removeJWTTokensToLocalStorage('refresh_token')
             removeJWTTokensToLocalStorage('access_token')
         }
@@ -66,13 +66,13 @@ const fetchNewAccessToken = async (refreshToken) => {
 };
 
 export const checkAuthentication = async () => {
-    console.log('Rerouting...')
+    // console.log('Rerouting...')
     // localStorage.removeItem('access_token')
     // localStorage.removeItem('refres_token')
     const accessToken = isJWTTokenValid('access_token')
     const refreshToken = isJWTTokenValid('refresh_token')
-    console.log('AccessToken: ', accessToken)
-    console.log('RefreshToken: ', refreshToken)
+    // console.log('AccessToken: ', accessToken)
+    // console.log('RefreshToken: ', refreshToken)
 
     if (accessToken) {
         return true;

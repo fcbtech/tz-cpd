@@ -12,7 +12,7 @@ export const useProfileStore = defineStore('profile', () => {
       let response = await axios.post('https://be.letstranzact.com/main/login/password-login/', payload)
 
 
-      console.log("Response: ", JSON.stringify(response));
+      // console.log("Response: ", JSON.stringify(response));
 
       setUserDetails(response);
       return {
@@ -42,7 +42,7 @@ export const useProfileStore = defineStore('profile', () => {
 
     let nextUrl = '/HomePage';
 
-    console.log("Redirecting login user: ", nextUrl);
+    // console.log("Redirecting login user: ", nextUrl);
     router.push(nextUrl)
   };
 
@@ -74,7 +74,7 @@ export const useProfileStore = defineStore('profile', () => {
       localStorage.setItem(Constants.COMPANY_ID, companyId)
 
     } catch (error) {
-      console.log(error)
+      console.log('Error in setting user details to localstorage: ', error)
     }
   }
 
