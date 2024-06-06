@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <NavBar />
+      <NavBar :userType="userType" />
     </div>
     <!-- <SnackBar :snack-bar="snackbar" message-text="SOME ERROR" /> -->
     <!-- <v-snackbar v-model="snackbar" :timeout="timeout" color="red-lighten-3">
@@ -166,7 +166,7 @@ import * as XLSX from 'xlsx';
 export default {
   data: () => ({
     isLoading: false,
-    userType: 'dt',
+    userType: '',
     snackbar: false,
     timeout: 5000,
     rules: [
@@ -338,6 +338,12 @@ export default {
       const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd/get-prospect", config);
       // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
       this.desserts = fetchedTokenResponse.data.data;
+      if(fetchedTokenResponse.data.userType === 'dt')
+        this.userType = 'Data Team'
+      else if(fetchedTokenResponse.data.userType === 'ase')
+        this.userType = 'Cluster Team'
+      else
+        this.userType = 'Unauthorised User'
       this.isLoading = false
     },
 
