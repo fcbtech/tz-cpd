@@ -7,13 +7,13 @@
         class="align-center justify-center"
         :persistent="true"
       >
-        <!-- <img src="@/assets/gif/tz-loader.gif" height="200px"> -->
-        <v-progress-circular
+        <img src="@/assets/gif/tz-loader.gif" height="200px">
+        <!-- <v-progress-circular
           color="primary"
           :size="65"
           :width="8"
           indeterminate
-        ></v-progress-circular>
+        ></v-progress-circular> -->
       </v-overlay>
   </template>
   
@@ -47,7 +47,6 @@
       text-align: center;
       padding-top: 200px;
       font-size: 30px;
-      font-family: sans-serif;
-      z-index: 99;
+      z-index: 99999;
     }
   </style>
