@@ -7,15 +7,17 @@
     <!-- <v-snackbar v-model="snackbar" :timeout="timeout" color="red-lighten-3">
       'Error '
     </v-snackbar> -->
-    <div style="margin-top:100px;">
-      <!-- <v-text-field
-        v-model="search"
-        label="Search"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        hide-details
-        single-line
+    
+    <!-- <v-text-field
+      v-model="search"
+      label="Search"
+      prepend-inner-icon="mdi-magnify"
+      variant="outlined"
+      hide-details
+      single-line
       ></v-text-field> -->
+      <div :style="[ isLoading ? {'margin-top' : '100px', 'filter' : 'blur(2px)' } : { 'margin-top' : '100px' }]">
+      <Loader :loading='isLoading'/>
       <v-data-table hover fixed-header height="500" density="compact" item-key="name" :search="search" :headers="headers" :items="filteredData" :sort-by="[{ key: 'company_name', order: 'asc' }]">
         <template
           v-for="(header, i) in headers.slice(1, headers.length)"
@@ -163,6 +165,8 @@ import * as XLSX from 'xlsx';
 
 export default {
   data: () => ({
+    isLoading: false,
+    userType: 'dt',
     snackbar: false,
     timeout: 5000,
     rules: [
@@ -318,6 +322,7 @@ export default {
 
     },
     async initialize() {
+      this.isLoading = true
       const isAuthenticated = await checkAuthentication()
       if(!isAuthenticated) {
         router.push('/')
@@ -333,6 +338,7 @@ export default {
       const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd/get-prospect", config);
       // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
       this.desserts = fetchedTokenResponse.data.data;
+      this.isLoading = false
     },
 
     editItem(item) {
@@ -372,6 +378,7 @@ export default {
 
     async save() {
       this.close()
+      this.isLoading = true
       if (this.editedIndex > -1) {
         // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
         Object.assign(this.desserts[this.editedIndex], this.editedItem)
@@ -384,6 +391,7 @@ export default {
       } else {
         this.desserts.push(this.editedItem)
       }
+      this.isLoading = false
     },
 
     closeUpload() {
