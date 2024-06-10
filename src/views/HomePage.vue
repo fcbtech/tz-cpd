@@ -174,7 +174,7 @@
         </template>
         <template v-slot:item.actions="{ item }">
           <!-- TODO: show 'Create Deal' button for Data Team -->
-          <v-btn v-if="userType === 'Cluster Team'" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="createDeal(item)">
+          <v-btn v-if="userType === 'Cluster Team'" :disabled="item['hb_deal_id'] !== '' && item['hb_deal_id'] !== null" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="createDeal(item)">
             Create Deal
           </v-btn>
           <v-icon v-if="userType === 'Cluster Team'" class="me-2" size="x-small" @click="editItem(item)">
