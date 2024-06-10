@@ -4,10 +4,10 @@
       <NavBar :userType="userType" />
     </div>
     <!-- <SnackBar :snackbar-prop="snackbar" bar-color="red-darken-1" message-text="SOME ERROR" /> -->
-    <v-snackbar v-model="snackbar" :timeout="timeout" color="red-lighten-3">
+    <v-snackbar class="text-center" location="bottom center" v-model="snackbar" :timeout="timeout" :color="snackbarColor">
       {{  snackbarMessage }}
     </v-snackbar>
-    <v-btn v-if="desserts.length === 0 && !isLoading" class="allot-data-btn" color="primary" @click="initialize">
+    <v-btn v-if="desserts.length === 0 && !isLoading" class="allot-data-btn" color="primary" @click="initialize(1)">
       Allot Data
     </v-btn>
     <!-- <v-snackbar v-model="snackbar" :timeout="timeout" color="red-lighten-3">
@@ -180,7 +180,8 @@ export default {
     userType: '',
     snackbar: false,
     snackbarMessage: 'Something Went Wrong',
-    timeout: 5000,
+    snackbarColor: 'red-lighten-3',
+    timeout: 6000,
     rules: [
       value => {
         return (
@@ -318,7 +319,7 @@ export default {
 
   created() {
     this.initialiseEditedItem()
-    // this.initialize()
+    this.initialize(0)
   },
 
   methods: {
@@ -333,30 +334,44 @@ export default {
       this.defaultItem = this.editedItem
 
     },
-    async initialize() {
-      this.isLoading = true
-      const isAuthenticated = await checkAuthentication()
-      if(!isAuthenticated) {
-        router.push('/')
-        return;
+    async initialize(isNew) {
+      try {
+        this.isLoading = true
+        const isAuthenticated = await checkAuthentication()
+        if(!isAuthenticated) {
+          router.push('/')
+          return;
+        }
+        let config = {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
+          },
+        };
+        // const fetchedTokenResponse = await axios.get("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/get-prospect", config);
+        const fetchedTokenResponse = await axios.get(`http://localhost:56777/tz-cpd/get-prospect?isNew=${isNew}`, config);
+        console.log('DUBEY get-prospect: ', JSON.stringify(fetchedTokenResponse))
+        this.desserts = fetchedTokenResponse.data.data;
+        if(fetchedTokenResponse.data.userType === 'dt')
+          this.userType = 'Data Team'
+        else if(fetchedTokenResponse.data.userType === 'ase')
+          this.userType = 'Cluster Team'
+        else
+          this.userType = 'Unauthorised User'
+        this.isLoading = false
+        this.snackbarMessage = fetchedTokenResponse.data.message
+        if(fetchedTokenResponse.data.success) {
+          this.snackbarColor = 'blue-darken-1'
+        } else {
+          this.snackbarColor = 'red-lighten-3'
+        }
+        this.snackbar = true
+      } catch(error) {
+        this.isLoading = false
+        this.snackbar = true
+        this.snackbarMessage = 'Error in Fetching Prospects'
+        console.log('Error in fetching prospects', error)
       }
-      let config = {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
-        },
-      };
-      // const fetchedTokenResponse = await axios.get("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/get-prospect", config);
-      const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd/get-prospect", config);
-      // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
-      this.desserts = fetchedTokenResponse.data.data;
-      if(fetchedTokenResponse.data.userType === 'dt')
-        this.userType = 'Data Team'
-      else if(fetchedTokenResponse.data.userType === 'ase')
-        this.userType = 'Cluster Team'
-      else
-        this.userType = 'Unauthorised User'
-      this.isLoading = false
     },
 
     editItem(item) {
@@ -395,21 +410,35 @@ export default {
     },
 
     async save() {
-      this.close()
-      this.isLoading = true
-      if (this.editedIndex > -1) {
-        // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)
-        // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
-        await this.updateProspectinDB(this.desserts[this.editedIndex])
-        await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
-        // console.log('Calling initialize')
-        await this.initialize()
-        // console.log('Calling initialize Done')
-      } else {
-        this.desserts.push(this.editedItem)
+      try {
+        this.isLoading = true
+        if (this.editedIndex > -1) {
+          // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
+          if(!this.isObjectUpdated(this.desserts[this.editedIndex], this.editedItem)) {
+            this.snackbarMessage = 'No Fields Edited'
+            this.snackbarColor = 'red-lighten-3'
+            this.snackbar = true
+            this.isLoading = false
+            return
+          }
+          this.close()
+          Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
+          const updateProspectResponse = await this.updateProspectinDB(this.desserts[this.editedIndex])
+          await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
+          // console.log('Calling initialize')
+          await this.initialize()
+          // console.log('Calling initialize Done')
+        } else {
+          this.desserts.push(this.editedItem)
+        }
+        this.isLoading = false
+      } catch(error) {
+        this.isLoading = false
+        this.snackbarMessage = 'No Fields Edited'
+        this.snackbarColor = 'red-lighten-3'
+        this.snackbar = true
       }
-      this.isLoading = false
     },
 
     closeUpload() {
@@ -542,6 +571,7 @@ export default {
       const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/enrich", payload, config);
       // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
       // this.desserts = fetchedTokenResponse.data.data;
+      return fetchedTokenResponse
     },
     async createDeal(prospect) {
       try {
@@ -567,6 +597,14 @@ export default {
         this.snackbarMessage = 'Error in Creating Deal'
         console.log('Error in creating deal', error)
       }
+    },
+    isObjectUpdated (prospect, enrichedProspect) {
+      for(const field in prospect) {
+        if(prospect[field] !== enrichedProspect[field])
+          return true
+      }
+
+      return false
     }
   },
 }
