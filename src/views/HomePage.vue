@@ -334,7 +334,7 @@ export default {
       this.defaultItem = this.editedItem
 
     },
-    async initialize(isNew) {
+    async initialize(isNew, showMessage = true) {
       try {
         this.isLoading = true
         const isAuthenticated = await checkAuthentication()
@@ -365,7 +365,7 @@ export default {
         } else {
           this.snackbarColor = 'red-lighten-3'
         }
-        this.snackbar = true
+        this.snackbar = showMessage
       } catch(error) {
         this.isLoading = false
         this.snackbar = true
@@ -421,14 +421,18 @@ export default {
             this.isLoading = false
             return
           }
-          this.close()
           Object.assign(this.desserts[this.editedIndex], this.editedItem)
           // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
           const updateProspectResponse = await this.updateProspectinDB(this.desserts[this.editedIndex])
           await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
-          // console.log('Calling initialize')
-          await this.initialize()
-          // console.log('Calling initialize Done')
+          this.close()
+          console.log('Calling initialize')
+          await this.initialize(0, false)
+          console.log('Calling initialize Done')
+          this.snackbarMessage = updateProspectResponse.data.message
+          this.snackbarColor = 'blue-darken-1'
+          this.snackbar = true
+          this.isLoading = false
         } else {
           this.desserts.push(this.editedItem)
         }
@@ -600,11 +604,25 @@ export default {
     },
     isObjectUpdated (prospect, enrichedProspect) {
       for(const field in prospect) {
+        enrichedProspect[field] = this.removeSpaces(enrichedProspect[field])
+        prospect[field] = this.removeSpaces(prospect[field])
         if(prospect[field] !== enrichedProspect[field])
           return true
       }
 
       return false
+    },
+    removeSpaces(str) {
+      let start = 0
+      let end = str.length - 1
+
+      while(start < str.length && str[start] === ' ')
+        ++start
+
+      while(end > start && end >= 0 && str[end] === ' ')
+        --end
+
+      return str.slice(start, end+1)
     }
   },
 }
