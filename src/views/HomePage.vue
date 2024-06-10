@@ -58,7 +58,7 @@
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
             <!-- <v-dialog v-model="dialog" max-width="500px"> -->
-            <v-dialog v-model="dialog" max-width="1000px">
+            <v-dialog v-model="dialog" max-width="1200px" max-height="1200px">
               <v-card>
                 <v-card-title>
                   <span class="text-h5">Edit</span>
@@ -66,24 +66,57 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
-                      <v-col  cols="12" md="3" sm="6" v-for="(header) in headers.slice(1, headers.length)">
+                      <!-- <v-col  cols="12" md="3" sm="6" v-for="(header) in headers.slice(1, headers.length)">
                         <v-text-field v-model="editedItem[header.key]" :label="header.title" />
-                      </v-col>
-                      <!-- <v-col cols="12" md="4" sm="6">
-                        <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
-                      </v-col>
-                      <v-col cols="12" md="4" sm="6">
-                        <v-text-field v-model.number="editedItem.calories" label="Calories"></v-text-field>
-                      </v-col>
-                      <v-col cols="12" md="4" sm="6">
-                        <v-text-field v-model.number="editedItem.fat" label="Fat (g)"></v-text-field>
-                      </v-col>
-                      <v-col cols="12" md="4" sm="6">
-                        <v-text-field v-model.number="editedItem.carbs" label="Carbs (g)"></v-text-field>
-                      </v-col>
-                      <v-col cols="12" md="4" sm="6">
-                        <v-text-field v-model.number="editedItem.protein" label="Protein (g)"></v-text-field>
                       </v-col> -->
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model="editedItem['company_name']" label="Company Name"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['city']" label="City"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['state']" label="State"></v-text-field>
+                      </v-col>
+                      <!-- <v-col cols="12" md="3" sm="6">
+                        <StateSelect :current-state="editedItem['state']" @stateUpdated="editedItem['state']=$event"/>
+                      </v-col> -->
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['gstin']" label="GSTIN"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['sector']" label="Sector"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['turnover']" label="Turnover"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['industry']" label="Industry"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['poc_name']" label="POC Name"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['poc_contact_no']" label="POC Contact No"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['poc_email']" label="POC Email"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['poc_designation']" label="POC Designation"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['indiamart_link']" label="Indiamart Link"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['website']" label="Website"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['mfg_product']" label="Product"></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model.number="editedItem['quality_tag']" label="Quality Tag"></v-text-field>
+                      </v-col>
                     </v-row>
                   </v-container>
                 </v-card-text>
@@ -199,8 +232,8 @@ export default {
     dialogUpload: false,
     uploadedFile: [],
     headers: [
-    { title: 'Actions', key: 'actions', sortable: false, align:'center',
-      fixed: true, minWidth: '200', nowrap: true  },
+      { title: 'Actions', key: 'actions', sortable: false, align:'center',
+        fixed: true, minWidth: '200', nowrap: true  },
       {
         title: 'Company Name',
         align: 'start',
