@@ -7,6 +7,7 @@
     <v-container
       class="bg-white w-25 border-sm rounded-lg"
       style="margin-top: 100px"
+      @keyup.enter="loginSubmit"
     >
       <v-row>
         <v-col cols="12" class="d-flex justify-center">
@@ -104,6 +105,11 @@ let passwordRules = [
 
 const loginSubmit = async () => {
   try {
+    if(isDisabled.value) {
+      loginError.value = 'Username Password cannot be empty'
+      this.snackbar = true
+      return
+    }
     removeJWTTokensToLocalStorage('access_token')
     removeJWTTokensToLocalStorage('refresh_token')
     console.log("DUBEY: ", emailData.value + " " + passwordData.value);
