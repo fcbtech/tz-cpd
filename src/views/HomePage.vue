@@ -29,9 +29,9 @@
           v-for="(header, i) in headers.slice(1, headers.length)"
           v-slot:[`header.${header.key}`]="{ }"
         >
-        <span>
-          {{ header.title }}
-        </span>
+          <span>
+            {{ header.title }}
+          </span>
           <div @click.stop :key="i">
             <v-text-field
               :key="i"
@@ -189,6 +189,11 @@
           <!-- <v-icon size="small" @click="deleteItem(item)">
             mdi-delete
           </v-icon> -->
+        </template>
+        <template v-slot:item.hb_deal_id="{ item }">
+          <a :href="`https://app.hubspot.com/contacts/22031796/record/0-3/`+ item['hb_deal_id']" target="_blank">
+            {{ item['hb_deal_id'] }}
+          </a>
         </template>
         <!-- <template v-slot:no-data>
           <v-btn color="primary" @click="initialize">
