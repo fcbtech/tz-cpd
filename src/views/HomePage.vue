@@ -73,49 +73,49 @@
                         <v-text-field v-model="editedItem['company_name']" label="Company Name"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['city']" label="City"></v-text-field>
+                        <v-text-field v-model="editedItem['city']" label="City"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['state']" label="State"></v-text-field>
+                        <v-text-field v-model="editedItem['state']" label="State"></v-text-field>
                       </v-col>
                       <!-- <v-col cols="12" md="3" sm="6">
                         <StateSelect :current-state="editedItem['state']" @stateUpdated="editedItem['state']=$event"/>
                       </v-col> -->
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['gstin']" label="GSTIN"></v-text-field>
+                        <v-text-field v-model="editedItem['gstin']" label="GSTIN"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['sector']" label="Sector"></v-text-field>
+                        <v-text-field v-model="editedItem['sector']" label="Sector"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['turnover']" label="Turnover"></v-text-field>
+                        <v-text-field v-model="editedItem['turnover']" label="Turnover"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['industry']" label="Industry"></v-text-field>
+                        <v-text-field v-model="editedItem['industry']" label="Industry"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['poc_name']" label="POC Name"></v-text-field>
+                        <v-text-field v-model="editedItem['poc_name']" label="POC Name"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['poc_contact_no']" label="POC Contact No"></v-text-field>
+                        <v-text-field v-model="editedItem['poc_contact_no']" label="POC Contact No"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['poc_email']" label="POC Email"></v-text-field>
+                        <v-text-field v-model="editedItem['poc_email']" label="POC Email"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['poc_designation']" label="POC Designation"></v-text-field>
+                        <v-text-field v-model="editedItem['poc_designation']" label="POC Designation"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['indiamart_link']" label="Indiamart Link"></v-text-field>
+                        <v-text-field v-model="editedItem['indiamart_link']" label="Indiamart Link"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['website']" label="Website"></v-text-field>
+                        <v-text-field v-model="editedItem['website']" label="Website"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['mfg_product']" label="Product"></v-text-field>
+                        <v-text-field v-model="editedItem['mfg_product']" label="Product"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model.number="editedItem['quality_tag']" label="Quality Tag"></v-text-field>
+                        <v-text-field v-model="editedItem['quality_tag']" label="Quality Tag"></v-text-field>
                       </v-col>
                     </v-row>
                   </v-container>
@@ -194,6 +194,9 @@
           <a :href="`https://app.hubspot.com/contacts/22031796/record/0-3/`+ item['hb_deal_id']" target="_blank">
             {{ item['hb_deal_id'] }}
           </a>
+        </template>
+        <template v-slot:item.hb_deal_creation_date="{ item }">
+          {{ getDateInFormat(item['hb_deal_creation_date'].value) }}
         </template>
         <!-- <template v-slot:no-data>
           <v-btn color="primary" @click="initialize">
@@ -661,6 +664,11 @@ export default {
         --end
 
       return str.slice(start, end+1)
+    },
+    getDateInFormat (dateStamp) {
+      const date = new Date(dateStamp)
+      const dateString = date.toString().split(' ')
+      return dateString[2] + ' ' + dateString[1] + ' ' + dateString[3] + '(' + dateString[4] + ')'
     }
   },
 }
