@@ -644,16 +644,21 @@ export default {
       }
     },
     isObjectUpdated (prospect, enrichedProspect) {
-      for(const field in prospect) {
-        enrichedProspect[field] = this.removeSpaces(enrichedProspect[field])
+      for(const field of Object.keys(prospect)) {
         prospect[field] = this.removeSpaces(prospect[field])
-        if(prospect[field] !== enrichedProspect[field])
+        prospect[field] = this.removeSpaces(prospect[field])
+
+        if(prospect[field] !== enrichedProspect[field]) {
           return true
+        }
       }
 
       return false
     },
     removeSpaces(str) {
+      if(typeof str !== 'string') {
+        return str 
+      }
       let start = 0
       let end = str.length - 1
 
