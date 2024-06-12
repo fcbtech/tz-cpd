@@ -75,12 +75,12 @@
                       <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="editedItem['city']" label="City"></v-text-field>
                       </v-col>
-                      <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="editedItem['state']" label="State"></v-text-field>
-                      </v-col>
                       <!-- <v-col cols="12" md="3" sm="6">
-                        <StateSelect :current-state="editedItem['state']" @stateUpdated="editedItem['state']=$event"/>
+                        <v-text-field v-model="editedItem['state']" label="State"></v-text-field>
                       </v-col> -->
+                      <v-col cols="12" md="3" sm="6">
+                        <StateSelect :current-state="editedItem['state']" @stateUpdated="editedItem['state']=$event"/>
+                      </v-col>
                       <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="editedItem['gstin']" label="GSTIN"></v-text-field>
                       </v-col>
@@ -91,7 +91,7 @@
                         <v-text-field v-model="editedItem['turnover']" label="Turnover"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="editedItem['industry']" label="Industry"></v-text-field>
+                        <IndustrySelect :current-industry="editedItem['industry']" @industryUpdated="editedItem['industry']=$event" />
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="editedItem['poc_name']" label="POC Name"></v-text-field>
@@ -480,7 +480,7 @@ export default {
         this.isLoading = false
       } catch(error) {
         this.isLoading = false
-        this.snackbarMessage = 'No Fields Edited'
+        this.snackbarMessage = 'Error in Updation'
         this.snackbarColor = 'red-lighten-3'
         this.snackbar = true
       }

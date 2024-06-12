@@ -1,6 +1,5 @@
 <template>
     <v-select
-      clearable
       v-model="selectedState"
       label="States"
       :items="statesList"
