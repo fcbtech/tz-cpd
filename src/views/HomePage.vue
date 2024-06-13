@@ -38,7 +38,7 @@
               v-model="multiSearch[header.key]"
               class="text-capitalize pa"
               type="text"
-              :placeholder="header.key.charAt(0).toUpperCase() + header.key.slice(1)"
+              :placeholder="header.title"
             ></v-text-field>
           </div>
         </template>
