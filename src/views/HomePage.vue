@@ -174,10 +174,10 @@
         </template>
         <template v-slot:item.actions="{ item }">
           <!-- TODO: show 'Create Deal' button for Data Team -->
-          <v-btn v-if="userType === 'Cluster Team'" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="pickDeal(item)">
+          <v-btn v-if="userType === 'Cluster Team' && item['ase_processed_sts'] !== 2" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="pickDeal(item)">
             Pick Deal
           </v-btn>
-          <v-icon v-if="userType === 'Cluster Team'" class="me-2" size="x-small" @click="editItem(item)">
+          <v-icon v-if="userType === 'Cluster Team' && item['ase_processed_sts'] !== 2" class="me-2" size="x-small" @click="editItem(item)">
             mdi-pencil
           </v-icon>
           <v-btn v-if="userType === 'Data Team'" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="editItem(item)">
