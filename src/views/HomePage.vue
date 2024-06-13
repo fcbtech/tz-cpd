@@ -24,7 +24,7 @@
       ></v-text-field> -->
       <div :style="[ isLoading ? {'margin-top' : '100px', 'filter' : 'blur(2px)' } : { 'margin-top' : '100px' }]">
       <Loader :loading='isLoading'/>
-      <v-data-table hover fixed-header height="500" density="compact" item-key="name" :search="search" :headers="headers" :items="filteredData" :sort-by="[{ key: 'company_name', order: 'asc' }]">
+      <v-data-table :row-props="rowBackground" hover fixed-header height="500" density="compact" item-key="name" :search="search" :headers="headers" :items="filteredData" :sort-by="[{ key: 'company_name', order: 'asc' }]">
         <template
           v-for="(header, i) in headers.slice(1, headers.length)"
           v-slot:[`header.${header.key}`]="{ }"
@@ -364,6 +364,11 @@ export default {
   },
 
   methods: {
+    rowBackground(item) {
+      if(this.userType === 'Data Team' && item.item['dt_processed_sts'] === 2) {
+        return { style: 'background: rgb(191 255 191);' };
+      }
+    },
     initialiseEditedItem() {
       this.editedItem = {}
 
