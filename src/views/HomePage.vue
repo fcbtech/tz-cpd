@@ -417,6 +417,19 @@ export default {
 
     editItem(item) {
       // console.log('DUBEY: desserts: ', this.desserts)
+      if(this.userType === 'Data Team' && item['dt_processed_sts'] === 2) {
+        this.snackbarMessage = 'Cannot Edit Enriched Prospect'
+        this.snackbarColor = 'red-lighten-3'
+        this.snackbar = true
+        return
+      }
+
+      if(this.userType === 'Cluster Team' && item['ase_processed_sts'] === 2) {
+        this.snackbarMessage = 'Cannot Edit Picked Deal'
+        this.snackbarColor = 'red-lighten-3'
+        this.snackbar = true
+        return
+      }
       this.editedIndex = this.desserts.indexOf(item)
       this.editedItem = Object.assign({}, item)
       // console.log('DUBEY: editedItem before save: ', this.editedItem)
