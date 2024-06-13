@@ -85,7 +85,7 @@
                         <v-text-field v-model="editedItem['gstin']" label="GSTIN"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="editedItem['sector']" label="Sector"></v-text-field>
+                        <SectorSelect :current-sector="editedItem['sector']" @sectorUpdated="editedItem['sector']=$event"/>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="editedItem['turnover']" label="Turnover"></v-text-field>
