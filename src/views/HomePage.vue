@@ -174,8 +174,8 @@
         </template>
         <template v-slot:item.actions="{ item }">
           <!-- TODO: show 'Create Deal' button for Data Team -->
-          <v-btn v-if="userType === 'Cluster Team'" :disabled="item['hb_deal_id'] !== '' && item['hb_deal_id'] !== null" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="createDeal(item)">
-            Create Deal
+          <v-btn v-if="userType === 'Cluster Team'" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="pickDeal(item)">
+            Pick Deal
           </v-btn>
           <v-icon v-if="userType === 'Cluster Team'" class="me-2" size="x-small" @click="editItem(item)">
             mdi-pencil
@@ -631,8 +631,15 @@ export default {
       // this.desserts = fetchedTokenResponse.data.data;
       return fetchedTokenResponse
     },
-    async createDeal(prospect) {
+    async pickDeal(prospect) {
       try {
+        if(prospect['ase_processed_sts'] === 2) {
+          this.snackbarMessage = 'Deal Already Picked'
+          this.snackbarColor = 'red-lighten-3'
+          this.snackbar = true
+          return
+        }
+        this.isLoading = true
         const isAuthenticated = await checkAuthentication()
         if(!isAuthenticated) {
           router.push('/')
@@ -644,13 +651,18 @@ export default {
             Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
           },
         };
+        // prospect['ase_processed_sts'] = 2
         const payload = [prospect]
         // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
-        this.snackbar = true
         const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/create-deal", payload, config);
-        console.log('DUBEY createDeal: ', JSON.stringify(fetchedTokenResponse))
+        this.snackbarMessage = fetchedTokenResponse.data.message
+        this.snackbarColor = 'blue-darken-1'
+        this.snackbar = true
+        console.log('DUBEY pickDeal: ', JSON.stringify(fetchedTokenResponse.data))
+        this.isLoading = false
         // this.desserts = fetchedTokenResponse.data.data;
       } catch(error) {
+        this.isLoading = false
         this.snackbar = true
         this.snackbarMessage = 'Error in Creating Deal'
         console.log('Error in creating deal', error)
