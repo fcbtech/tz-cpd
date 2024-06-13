@@ -143,6 +143,17 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
+            <v-dialog v-model="dialogPickDeal" max-width="500px">
+              <v-card loading max-height="200px">
+                <v-card-text class="text-center text-h5">Are you sure you want to pick this deal?</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue-darken-1" variant="text" @click="closePickDeal">No</v-btn>
+                  <v-btn color="blue-darken-1" variant="text" @click="pickDeal">Yes</v-btn>
+                  <v-spacer></v-spacer>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
             <v-dialog v-model="dialogUpload" max-width="800px">
               <template v-slot:activator="{ props }">
                 <!-- <v-btn class="mb-2" color="primary" dark v-bind="props">
@@ -174,7 +185,7 @@
         </template>
         <template v-slot:item.actions="{ item }">
           <!-- TODO: show 'Create Deal' button for Data Team -->
-          <v-btn v-if="userType === 'Cluster Team' && item['ase_processed_sts'] !== 2" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="pickDeal(item)">
+          <v-btn v-if="userType === 'Cluster Team' && item['ase_processed_sts'] !== 2" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="this.dialogPickDeal = true; this.pickDealIndex = this.desserts.indexOf(item)">
             Pick Deal
           </v-btn>
           <v-icon v-if="userType === 'Cluster Team' && item['ase_processed_sts'] !== 2" class="me-2" size="x-small" @click="editItem(item)">
@@ -238,6 +249,8 @@ export default {
     dialog: false,
     dialogDelete: false,
     dialogUpload: false,
+    dialogPickDeal: false,
+    pickDealIndex: -1,
     uploadedFile: [],
     headers: [
       { title: 'Actions', key: 'actions', sortable: false, align:'center',
@@ -356,6 +369,9 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete()
     },
+    dialogPickDeal(val) {
+      val || this.closePickDeal()
+    }
   },
 
   created() {
@@ -465,6 +481,13 @@ export default {
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
+      })
+    },
+
+    closePickDeal() {
+      this.dialogPickDeal = false
+      this.$nextTick(() => {
+        this.pickDealIndex = -1
       })
     },
 
@@ -636,14 +659,19 @@ export default {
       // this.desserts = fetchedTokenResponse.data.data;
       return fetchedTokenResponse
     },
-    async pickDeal(prospect) {
+
+    async pickDeal() {
       try {
+        const prospect = this.desserts[this.pickDealIndex]
+        
         if(prospect['ase_processed_sts'] === 2) {
           this.snackbarMessage = 'Deal Already Picked'
           this.snackbarColor = 'red-lighten-3'
           this.snackbar = true
           return
         }
+
+        this.closePickDeal()
         this.isLoading = true
         const isAuthenticated = await checkAuthentication()
         if(!isAuthenticated) {
@@ -670,6 +698,7 @@ export default {
         this.isLoading = false
         this.snackbar = true
         this.snackbarMessage = 'Error in Creating Deal'
+        this.closePickDeal()
         console.log('Error in creating deal', error)
       }
     },
