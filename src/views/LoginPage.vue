@@ -112,16 +112,13 @@ const loginSubmit = async () => {
     }
     removeJWTTokensToLocalStorage('access_token')
     removeJWTTokensToLocalStorage('refresh_token')
-    console.log("DUBEY: ", emailData.value + " " + passwordData.value);
     const userDataPayload = {
       email: emailData.value,
       password: passwordData.value,
     };
 
     let loginResponse = await submitLoginAction(userDataPayload);
-    console.info("DUBEY RESPONSE: ", loginResponse);
     if (loginResponse.message !== '') {
-      console.info("DUBEY RESPONSE MESSAGE: ", loginResponse.message);
       loginError.value = 'The Login ID and Password are incorrect'
       snackbar.value = true
     }

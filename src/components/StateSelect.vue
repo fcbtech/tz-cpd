@@ -18,8 +18,6 @@ export default {
   },
   methods: {
     emitEvent (state) {
-      console.log('DUBEY: ', state)
-      // this.selectedState = state
       this.$emit('stateUpdated', state)
     }
   },

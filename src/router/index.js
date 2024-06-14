@@ -34,23 +34,18 @@ router.beforeEach(async (to, from, next) => {
     // explicitly return false to cancel the navigation
     // return true;
     const isAuthenticated = await checkAuthentication();
-    console.log('IsAuthenticated: ', isAuthenticated)
     if (isAuthenticated) {
 
         if(to.name === 'LoginPage') {
-            console.log('Rerouting to : HomePage')
             next({ name: 'HomePage' })
         } else {
-            console.log('Rerouting to : ', to.fullPath)
             next()
         }
     }
 
     else if (to.name !== 'LoginPage') {
-        console.log('Rerouting to : LoginPage')
         next({ name: 'LoginPage' });
     } else {
-        console.log('Rerouting to : ', to.fullPath)
         next()
     }
 

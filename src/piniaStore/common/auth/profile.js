@@ -10,10 +10,6 @@ export const useProfileStore = defineStore('profile', () => {
 
     try {
       let response = await axios.post('https://be.letstranzact.com/main/login/password-login/', payload)
-
-
-      // console.log("Response: ", JSON.stringify(response));
-
       setUserDetails(response);
       return {
         message: response.data.message,
@@ -41,8 +37,6 @@ export const useProfileStore = defineStore('profile', () => {
   const redirectLoginUser = async (payload) => {
 
     let nextUrl = '/HomePage';
-
-    // console.log("Redirecting login user: ", nextUrl);
     router.push(nextUrl)
   };
 

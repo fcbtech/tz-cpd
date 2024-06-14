@@ -359,7 +359,6 @@ export default {
         };
         const fetchedTokenResponse = await axios.get(`https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/get-prospect?isNew=${isNew}`, config);
         // const fetchedTokenResponse = await axios.get(`http://localhost:56777/tz-cpd/get-prospect?isNew=${isNew}`, config);
-        console.log('DUBEY get-prospect: ', JSON.stringify(fetchedTokenResponse))
         this.fetchedProspects = fetchedTokenResponse.data.data;
         if(fetchedTokenResponse.data.userType === 'dt')
           this.userType = 'Data Team'
@@ -385,7 +384,6 @@ export default {
     },
 
     editItem(item) {
-      // console.log('DUBEY: fetchedProspects: ', this.fetchedProspects)
       if(this.userType === 'Data Team' && item['dt_processed_sts'] === 2) {
         this.snackbarMessage = 'Cannot Edit Enriched Prospect'
         this.snackbarColor = 'red-lighten-3'
@@ -401,7 +399,6 @@ export default {
       }
       this.editedIndex = this.fetchedProspects.indexOf(item)
       this.editedItem = Object.assign({}, item)
-      // console.log('DUBEY: editedItem before save: ', this.editedItem)
       this.dialog = true
     },
 
@@ -424,7 +421,6 @@ export default {
       try {
         this.isLoading = true
         if (this.editedIndex > -1) {
-          // console.log('DUBEY: items in fetchedProspects being edited: ', this.fetchedProspects[this.editedIndex])
           if(!this.isObjectUpdated(this.fetchedProspects[this.editedIndex], this.editedItem)) {
             this.snackbarMessage = 'No Fields Edited'
             this.snackbarColor = 'red-lighten-3'
@@ -433,12 +429,9 @@ export default {
             return
           }
           Object.assign(this.fetchedProspects[this.editedIndex], this.editedItem)
-          // console.log('DUBEY: items in fetchedProspects being edited: ', this.fetchedProspects[this.editedIndex])
           const updateProspectResponse = await this.updateProspectinDB(this.fetchedProspects[this.editedIndex])
           await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
           this.close()
-          console.log('Calling initialize')
-          console.log('Calling initialize Done')
           this.snackbarMessage = updateProspectResponse.data.message
           this.snackbarColor = 'blue-darken-1'
           this.snackbar = true
@@ -460,7 +453,6 @@ export default {
 
     closeUpload() {
       this.dialogUpload = false
-      // console.log('DUBEY: closeUpload() uploaded file: ', this.uploadedFile)
     },
 
     handleFileUpload(event) {
@@ -473,15 +465,11 @@ export default {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         this.uploadedFile = XLSX.utils.sheet_to_json(worksheet);
-        // console.log("Converted JSON:", this.uploadedFile);
       };
       reader.readAsArrayBuffer(file);
     },
 
     async uploadExcel() {
-      // console.log("Dubey uploading excel file")
-      // console.log('DUBEY: uploaded file: ', this.uploadedFile)
-      // console.log('DUBEY: length uploaded file: ', this.uploadedFile.length)
       //TODO: Trigger API for adding data to database and 
       //get the data for fields not added
       this.closeUpload();
@@ -507,7 +495,6 @@ export default {
         // const payload = formData
         const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", this.uploadedFile, config);
         // const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd-api/tz-cpd/bulk-insert", config);
-        // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse.data.data))
         this.apiResponse = fetchedTokenResponse.data.data
         if(fetchedTokenResponse.data.code === 'insert_partial') {
           this.downloadErrorExcel()
@@ -588,9 +575,6 @@ export default {
       };
       const payload = [enrichedProspect]
       const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
-      // const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/enrich", payload, config);
-      // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
-      // this.fetchedProspects = fetchedTokenResponse.data.data;
       return fetchedTokenResponse
     },
 
@@ -618,15 +602,11 @@ export default {
             Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
           },
         };
-        // prospect['ase_processed_sts'] = 2
         const payload = [prospect]
         const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/create-deal", payload, config);
-        // const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/create-deal", payload, config);
         this.snackbarMessage = fetchedTokenResponse.data.message
         this.snackbarColor = 'blue-darken-1'
         this.snackbar = true
-        console.log('DUBEY pickDeal: ', JSON.stringify(fetchedTokenResponse.data))
-        // this.fetchedProspects = fetchedTokenResponse.data.data;
       } catch(error) {
         this.snackbar = true
         this.snackbarMessage = 'Error in Creating Deal'
