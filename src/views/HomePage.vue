@@ -3,25 +3,12 @@
     <div>
       <NavBar :userType="userType" />
     </div>
-    <!-- <SnackBar :snackbar-prop="snackbar" bar-color="red-darken-1" message-text="SOME ERROR" /> -->
     <v-snackbar class="text-center" location="bottom center" v-model="snackbar" :timeout="timeout" :color="snackbarColor">
       {{  snackbarMessage }}
     </v-snackbar>
-    <v-btn v-if="desserts.length === 0 && !isLoading" class="allot-data-btn" color="primary" @click="initialize(1)">
+    <v-btn v-if="fetchedProspects.length === 0 && !isLoading" class="allot-data-btn" color="primary" @click="initialize(1)">
       Allot Data
     </v-btn>
-    <!-- <v-snackbar v-model="snackbar" :timeout="timeout" color="red-lighten-3">
-      'Error '
-    </v-snackbar> -->
-    
-    <!-- <v-text-field
-      v-model="search"
-      label="Search"
-      prepend-inner-icon="mdi-magnify"
-      variant="outlined"
-      hide-details
-      single-line
-      ></v-text-field> -->
       <div :style="[ isLoading ? {'margin-top' : '100px', 'filter' : 'blur(2px)' } : { 'margin-top' : '100px' }]">
       <Loader :loading='isLoading'/>
       <v-data-table :row-props="rowBackground" hover fixed-header height="500" density="compact" item-key="name" :search="search" :headers="headers" :items="filteredData" :sort-by="[{ key: 'company_name', order: 'asc' }]">
@@ -42,22 +29,11 @@
             ></v-text-field>
           </div>
         </template>
-        <!-- <template v-slot:text>
-          <v-text-field
-            v-model="search"
-            label="Search"
-            prepend-inner-icon="mdi-magnify"
-            variant="outlined"
-            hide-details
-            single-line
-          ></v-text-field>
-        </template> -->
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>Cluster Prospect</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
-            <!-- <v-dialog v-model="dialog" max-width="500px"> -->
             <v-dialog v-model="dialog" max-width="1200px" max-height="1200px">
               <v-card>
                 <v-card-title>
@@ -66,18 +42,12 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
-                      <!-- <v-col  cols="12" md="3" sm="6" v-for="(header) in headers.slice(1, headers.length)">
-                        <v-text-field v-model="editedItem[header.key]" :label="header.title" />
-                      </v-col> -->
                       <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="editedItem['company_name']" label="Company Name"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="editedItem['city']" label="City"></v-text-field>
                       </v-col>
-                      <!-- <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="editedItem['state']" label="State"></v-text-field>
-                      </v-col> -->
                       <v-col cols="12" md="3" sm="6">
                         <StateSelect :current-state="editedItem['state']" @stateUpdated="editedItem['state']=$event"/>
                       </v-col>
@@ -132,17 +102,6 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
-                <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancel</v-btn>
-                  <v-btn color="blue-darken-1" variant="text" @click="deleteItemConfirm">OK</v-btn>
-                  <v-spacer></v-spacer>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
             <v-dialog v-model="dialogPickDeal" max-width="500px">
               <v-card loading max-height="200px">
                 <v-card-text class="text-center text-h5">Are you sure you want to pick this deal?</v-card-text>
@@ -184,8 +143,7 @@
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
-          <!-- TODO: show 'Create Deal' button for Data Team -->
-          <v-btn v-if="userType === 'Cluster Team' && item['ase_processed_sts'] !== 2" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="this.dialogPickDeal = true; this.pickDealIndex = this.desserts.indexOf(item)">
+          <v-btn v-if="userType === 'Cluster Team' && item['ase_processed_sts'] !== 2" class="mr-5" color="blue-darken-1" variant="tonal" size="small" roudned="sm" @click="this.dialogPickDeal = true; this.pickDealIndex = this.fetchedProspects.indexOf(item)">
             Pick Deal
           </v-btn>
           <v-icon v-if="userType === 'Cluster Team' && item['ase_processed_sts'] !== 2" class="me-2" size="x-small" @click="editItem(item)">
@@ -197,9 +155,6 @@
               mdi-pencil
             </v-icon>
           </v-btn>
-          <!-- <v-icon size="small" @click="deleteItem(item)">
-            mdi-delete
-          </v-icon> -->
         </template>
         <template v-slot:item.hb_deal_id="{ item }">
           <a :href="`https://app.hubspot.com/contacts/22031796/record/0-3/`+ item['hb_deal_id']" target="_blank">
@@ -247,7 +202,6 @@ export default {
     multiSearch: {},
     search: '',
     dialog: false,
-    dialogDelete: false,
     dialogUpload: false,
     dialogPickDeal: false,
     pickDealIndex: -1,
@@ -295,7 +249,7 @@ export default {
       { title: 'Deal Creation Date', key: 'hb_deal_creation_date',
         minWidth: '200' }
     ],
-    desserts: [],
+    fetchedProspects: [],
     editedIndex: -1,
     editedItem: {},
     defaultItem: {},
@@ -304,14 +258,13 @@ export default {
         // Example API response data structure
         { rowNumber: 2, invalidMessage: 'Invalid email address' },
         { rowNumber: 5, invalidMessage: 'Missing phone number' }
-        // Add more rows as needed
       ]
   }),
 
   computed: {
     filteredData() {
         if (this.multiSearch) {
-            return this.desserts.filter((item) => {
+            return this.fetchedProspects.filter((item) => {
                 return Object.entries(this.multiSearch).every(([key, value]) => {
                     if (value.includes("|") && !value.includes("!")) {
                         let el = value.split("|");
@@ -351,11 +304,8 @@ export default {
                 });
             });
         } else {
-        return this.desserts;
+        return this.fetchedProspects;
         }
-    },
-    formTitle() {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
     },
     isDisabled() {
       return this.uploadedFile.length === 0;
@@ -365,9 +315,6 @@ export default {
   watch: {
     dialog(val) {
       val || this.close()
-    },
-    dialogDelete(val) {
-      val || this.closeDelete()
     },
     dialogPickDeal(val) {
       val || this.closePickDeal()
@@ -413,7 +360,7 @@ export default {
         const fetchedTokenResponse = await axios.get(`https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/get-prospect?isNew=${isNew}`, config);
         // const fetchedTokenResponse = await axios.get(`http://localhost:56777/tz-cpd/get-prospect?isNew=${isNew}`, config);
         console.log('DUBEY get-prospect: ', JSON.stringify(fetchedTokenResponse))
-        this.desserts = fetchedTokenResponse.data.data;
+        this.fetchedProspects = fetchedTokenResponse.data.data;
         if(fetchedTokenResponse.data.userType === 'dt')
           this.userType = 'Data Team'
         else if(fetchedTokenResponse.data.userType === 'ase')
@@ -438,7 +385,7 @@ export default {
     },
 
     editItem(item) {
-      // console.log('DUBEY: desserts: ', this.desserts)
+      // console.log('DUBEY: fetchedProspects: ', this.fetchedProspects)
       if(this.userType === 'Data Team' && item['dt_processed_sts'] === 2) {
         this.snackbarMessage = 'Cannot Edit Enriched Prospect'
         this.snackbarColor = 'red-lighten-3'
@@ -452,33 +399,14 @@ export default {
         this.snackbar = true
         return
       }
-      this.editedIndex = this.desserts.indexOf(item)
+      this.editedIndex = this.fetchedProspects.indexOf(item)
       this.editedItem = Object.assign({}, item)
       // console.log('DUBEY: editedItem before save: ', this.editedItem)
       this.dialog = true
     },
 
-    deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
-    },
-
-    deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1)
-      this.closeDelete()
-    },
-
     close() {
       this.dialog = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      })
-    },
-
-    closeDelete() {
-      this.dialogDelete = false
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
@@ -496,17 +424,17 @@ export default {
       try {
         this.isLoading = true
         if (this.editedIndex > -1) {
-          // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
-          if(!this.isObjectUpdated(this.desserts[this.editedIndex], this.editedItem)) {
+          // console.log('DUBEY: items in fetchedProspects being edited: ', this.fetchedProspects[this.editedIndex])
+          if(!this.isObjectUpdated(this.fetchedProspects[this.editedIndex], this.editedItem)) {
             this.snackbarMessage = 'No Fields Edited'
             this.snackbarColor = 'red-lighten-3'
             this.snackbar = true
             this.isLoading = false
             return
           }
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
-          // console.log('DUBEY: items in desserts being edited: ', this.desserts[this.editedIndex])
-          const updateProspectResponse = await this.updateProspectinDB(this.desserts[this.editedIndex])
+          Object.assign(this.fetchedProspects[this.editedIndex], this.editedItem)
+          // console.log('DUBEY: items in fetchedProspects being edited: ', this.fetchedProspects[this.editedIndex])
+          const updateProspectResponse = await this.updateProspectinDB(this.fetchedProspects[this.editedIndex])
           await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
           this.close()
           console.log('Calling initialize')
@@ -516,7 +444,7 @@ export default {
           this.snackbar = true
           this.isLoading = false
         } else {
-          this.desserts.push(this.editedItem)
+          this.fetchedProspects.push(this.editedItem)
         }
         this.isLoading = false
       } catch(error) {
@@ -534,6 +462,7 @@ export default {
       this.dialogUpload = false
       // console.log('DUBEY: closeUpload() uploaded file: ', this.uploadedFile)
     },
+
     handleFileUpload(event) {
       const file = event.target.files[0];
       this.uploadedExcelFile = file
@@ -548,6 +477,7 @@ export default {
       };
       reader.readAsArrayBuffer(file);
     },
+
     async uploadExcel() {
       // console.log("Dubey uploading excel file")
       // console.log('DUBEY: uploaded file: ', this.uploadedFile)
@@ -635,6 +565,7 @@ export default {
 
       reader.readAsArrayBuffer(this.uploadedExcelFile);
     },
+
     s2ab(s) {
       const buf = new ArrayBuffer(s.length);
       const view = new Uint8Array(buf);
@@ -659,13 +590,13 @@ export default {
       const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
       // const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/enrich", payload, config);
       // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
-      // this.desserts = fetchedTokenResponse.data.data;
+      // this.fetchedProspects = fetchedTokenResponse.data.data;
       return fetchedTokenResponse
     },
 
     async pickDeal() {
       try {
-        const prospect = this.desserts[this.pickDealIndex]
+        const prospect = this.fetchedProspects[this.pickDealIndex]
         
         if(prospect['ase_processed_sts'] === 2) {
           this.snackbarMessage = 'Deal Already Picked'
@@ -695,7 +626,7 @@ export default {
         this.snackbarColor = 'blue-darken-1'
         this.snackbar = true
         console.log('DUBEY pickDeal: ', JSON.stringify(fetchedTokenResponse.data))
-        // this.desserts = fetchedTokenResponse.data.data;
+        // this.fetchedProspects = fetchedTokenResponse.data.data;
       } catch(error) {
         this.snackbar = true
         this.snackbarMessage = 'Error in Creating Deal'
@@ -707,6 +638,7 @@ export default {
         this.initialize(0, false)
       }
     },
+
     isObjectUpdated (prospect, enrichedProspect) {
       for(const field of Object.keys(prospect)) {
         prospect[field] = this.removeSpaces(prospect[field])
@@ -719,6 +651,7 @@ export default {
 
       return false
     },
+
     removeSpaces(str) {
       if(typeof str !== 'string') {
         return str 
@@ -734,6 +667,7 @@ export default {
 
       return str.slice(start, end+1)
     },
+
     getDateInFormat (dateStamp) {
       const date = new Date(dateStamp)
       const dateString = date.toString().split(' ')
