@@ -410,8 +410,8 @@ export default {
             Authorization: `Bearer ${getJWTTokenFromLocalStorage()}`,
           },
         };
-        // const fetchedTokenResponse = await axios.get("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/get-prospect", config);
-        const fetchedTokenResponse = await axios.get(`http://localhost:56777/tz-cpd/get-prospect?isNew=${isNew}`, config);
+        const fetchedTokenResponse = await axios.get(`https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/get-prospect?isNew=${isNew}`, config);
+        // const fetchedTokenResponse = await axios.get(`http://localhost:56777/tz-cpd/get-prospect?isNew=${isNew}`, config);
         console.log('DUBEY get-prospect: ', JSON.stringify(fetchedTokenResponse))
         this.desserts = fetchedTokenResponse.data.data;
         if(fetchedTokenResponse.data.userType === 'dt')
@@ -572,8 +572,8 @@ export default {
         // const formData = new FormData();
         // formData.append('excelFile', this.uploadedFile);
         // const payload = formData
-        // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", this.uploadedFile, config);
-        const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd-api/tz-cpd/bulk-insert", config);
+        const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", this.uploadedFile, config);
+        // const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd-api/tz-cpd/bulk-insert", config);
         // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse.data.data))
         this.apiResponse = fetchedTokenResponse.data.data
         if(fetchedTokenResponse.data.code === 'insert_partial') {
@@ -653,8 +653,8 @@ export default {
         },
       };
       const payload = [enrichedProspect]
-      // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
-      const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/enrich", payload, config);
+      const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
+      // const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/enrich", payload, config);
       // console.log('DUBEY: ', JSON.stringify(fetchedTokenResponse))
       // this.desserts = fetchedTokenResponse.data.data;
       return fetchedTokenResponse
@@ -686,8 +686,8 @@ export default {
         };
         // prospect['ase_processed_sts'] = 2
         const payload = [prospect]
-        // const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/enrich", payload, config);
-        const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/create-deal", payload, config);
+        const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/create-deal", payload, config);
+        // const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/create-deal", payload, config);
         this.snackbarMessage = fetchedTokenResponse.data.message
         this.snackbarColor = 'blue-darken-1'
         this.snackbar = true
