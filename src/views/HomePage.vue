@@ -88,7 +88,7 @@
                         <SectorSelect :current-sector="editedItem['sector']" @sectorUpdated="editedItem['sector']=$event"/>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="editedItem['turnover']" label="Turnover"></v-text-field>
+                        <TurnoverSelect :current-turnover="editedItem['turnover']" @turnoverUpdated="editedItem['turnover']=$event"/>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
                         <IndustrySelect :current-industry="editedItem['industry']" @industryUpdated="editedItem['industry']=$event" />
