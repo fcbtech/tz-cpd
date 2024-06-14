@@ -429,10 +429,11 @@ export default {
         }
         this.snackbar = showMessage
       } catch(error) {
-        this.isLoading = false
         this.snackbar = true
         this.snackbarMessage = 'Error in Fetching Prospects'
         console.log('Error in fetching prospects', error)
+      } finally {
+        this.isLoading = false
       }
     },
 
@@ -509,7 +510,6 @@ export default {
           await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
           this.close()
           console.log('Calling initialize')
-          await this.initialize(0, false)
           console.log('Calling initialize Done')
           this.snackbarMessage = updateProspectResponse.data.message
           this.snackbarColor = 'blue-darken-1'
@@ -520,10 +520,13 @@ export default {
         }
         this.isLoading = false
       } catch(error) {
-        this.isLoading = false
         this.snackbarMessage = 'Error in Updation'
         this.snackbarColor = 'red-lighten-3'
         this.snackbar = true
+      } finally {
+        this.close()
+        this.isLoading = false
+        await this.initialize(0, false)
       }
     },
 
@@ -692,14 +695,16 @@ export default {
         this.snackbarColor = 'blue-darken-1'
         this.snackbar = true
         console.log('DUBEY pickDeal: ', JSON.stringify(fetchedTokenResponse.data))
-        this.isLoading = false
         // this.desserts = fetchedTokenResponse.data.data;
       } catch(error) {
-        this.isLoading = false
         this.snackbar = true
         this.snackbarMessage = 'Error in Creating Deal'
         this.closePickDeal()
         console.log('Error in creating deal', error)
+      } finally {
+        this.closePickDeal()
+        this.isLoading = false
+        this.initialize(0, false)
       }
     },
     isObjectUpdated (prospect, enrichedProspect) {
