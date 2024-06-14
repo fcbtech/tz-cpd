@@ -49,19 +49,19 @@
                         <v-text-field v-model="editedItem['city']" label="City"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <StateSelect :current-state="editedItem['state']" @stateUpdated="editedItem['state']=$event"/>
+                        <SelectMenu :menu-text="State" :menu-list="statesList" :current-value="editedItem['state']" @menuUpdated="editedItem['state']=$event"/>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="editedItem['gstin']" label="GSTIN"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <SectorSelect :current-sector="editedItem['sector']" @sectorUpdated="editedItem['sector']=$event"/>
+                        <SelectMenu :menu-text="Sector" :menu-list="sectorList" :current-value="editedItem['sector']" @menuUpdated="editedItem['sector']=$event"/>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <TurnoverSelect :current-turnover="editedItem['turnover']" @turnoverUpdated="editedItem['turnover']=$event"/>
+                        <SelectMenu :menu-text="Turnover" :menu-list="turnoverList" :current-value="editedItem['turnover']" @menuUpdated="editedItem['turnover']=$event"/>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
-                        <IndustrySelect :current-industry="editedItem['industry']" @industryUpdated="editedItem['industry']=$event" />
+                        <SelectMenu :menu-text="Industry" :menu-list="industryList" :current-value="editedItem['industry']" @menuUpdated="editedItem['industry']=$event"/>
                       </v-col>
                       <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="editedItem['poc_name']" label="POC Name"></v-text-field>
@@ -255,10 +255,95 @@ export default {
     defaultItem: {},
     uploadedExcelFile: null,
     apiResponse: [
-        // Example API response data structure
-        { rowNumber: 2, invalidMessage: 'Invalid email address' },
-        { rowNumber: 5, invalidMessage: 'Missing phone number' }
-      ]
+      // Example API response data structure
+      { rowNumber: 2, invalidMessage: 'Invalid email address' },
+      { rowNumber: 5, invalidMessage: 'Missing phone number' }
+    ],
+    statesList: [
+      "Andhra Pradesh",
+      "Arunachal Pradesh",
+      "Assam",
+      "Bihar",
+      "Chhattisgarh",
+      "Goa",
+      "Gujarat",
+      "Haryana",
+      "Himachal Pradesh",
+      "Jammu and Kashmir",
+      "Jharkhand",
+      "Karnataka",
+      "Kerala",
+      "Madhya Pradesh",
+      "Maharashtra",
+      "Manipur",
+      "Meghalaya",
+      "Mizoram",
+      "Nagaland",
+      "Odisha",
+      "Punjab",
+      "Rajasthan",
+      "Sikkim",
+      "Tamil Nadu",
+      "Telangana",
+      "Tripura",
+      "Uttarakhand",
+      "Uttar Pradesh",
+      "West Bengal",
+      "Andaman and Nicobar Islands",
+      "Chandigarh",
+      "Dadra and Nagar Haveli",
+      "Daman and Diu",
+      "Delhi",
+      "Lakshadweep",
+      "Puducherry"
+    ],
+    industryList:
+    [
+      'Fashion Accessories & Supplies',
+      'Food and Beverage',
+      'Gems, Jewellery & Astrology',
+      'Industrial Machinery and Supplies',
+      'Mechanical Tools and Supplies',
+      'Automotive, Parts & Spares',
+      'Electrical and Electronics',
+      'Chemicals and Solvents',
+      'Plastic and Polymers',
+      'Packaging Machines and Materials',
+      'Metals, Alloys & Minerals',
+      'Instruments and Equipments',
+      'Petroleum',
+      'Drugs and Medical',
+      'Building and Construction',
+      'Apparel and Garments',
+      'Textiles, Yarn & Fabrics',
+      'Paper and Paper Products',
+      'Agriculture and Farming',
+      'Cosmetics and Personal care',
+      'FMCG',
+      'Handicrafts and Decoratives',
+      'Furniture & Supplies',
+      'House and Office Supplies',
+      'Others'
+    ],
+    sectorList: [
+      "Manufacturing",
+      "Service",
+      "Retail",
+      "Trading",
+      "Projects",
+      "Other"
+    ],
+    turnoverList:
+    [
+      "1) Rs 0 to 40 Lakhs",
+      "2) Rs 40 Lakhs to 1.5 Cr",
+      "3) Rs 1.5 Cr to 5 Cr",
+      "4) Rs 5 Cr to 25 Cr",
+      "5) Rs 25 Cr to 100 Cr",
+      "6) Rs 100 Cr to 500 Cr",
+      "7) Rs 500 Cr and above",
+      "8) Other"
+    ]
   }),
 
   computed: {
