@@ -1,0 +1,36 @@
+{
+	"name": "TranZact - CPD",
+	"short_name": "TranZact",
+	"manifest_version":3,
+	"description": "Tool for syncing TranZact data into your Tally Software",
+	"version": "1.0.0.0",
+	"action": {
+		"default_title": "Tranzact!",
+		"default_icon": "img/tranzact.png"
+	},
+	"icons": {
+		"16": "img/tranzact_16.png",
+		"48": "img/tranzact_48.png",
+		"128": "img/tranzact_128.png"
+
+	},
+
+	"background":{
+		"service_worker":"system_files/background.js"
+
+	},
+	"host_permissions": [
+		"http://localhost/*",
+		"https://app.letstranzact.com/",
+		"https://be.letstranzact.com/integration/accounting/tally-extension/post-approval-guid/",
+		"https://be.letstranzact.com/main/login/api-token-refresh/",
+		"https://be.letstranzact.com/integration/accounting/tally-extension/check-requesting-company/",
+		"https://be.letstranzact.com/main/login/password-login/",
+		"https://be.letstranzact.com/integration/accounting/tally-extension/check-ip/",
+		"https://be.letstranzact.com/integration/accounting/tally-extension/send-receive-data/",
+		"https://be.letstranzact.com/integration/accounting/tally-extension/post-approval-cancel-guid/",
+		"https://be.letstranzact.com/integration/accounting/tally-extension/post-voucher-cancel-guid/",
+		"https://asia-south1-tranzact-production.cloudfunctions.net/"
+		
+	]
+}
