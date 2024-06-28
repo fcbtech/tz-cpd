@@ -3,7 +3,7 @@
 	"short_name": "TranZact",
 	"manifest_version":3,
 	"description": "Tool for syncing TranZact data into your Tally Software",
-	"version": "1.0.0.0",
+	"version": "1.0.0.1",
 	"action": {
 		"default_title": "Tranzact!",
 		"default_icon": "img/tranzact.png"
