@@ -4,6 +4,7 @@ const FIRST_NAME = "first_name"
 const LAST_NAME = "last_name"
 const EMAIL = "email"
 const CONTACT_NO = "contact_no"
+const USER_ID = "user_id"
 const COMPANY_ID = 'company_id'
 const COMPANY_NAME = 'company_name'
 
@@ -14,6 +15,7 @@ export default {
     LAST_NAME: LAST_NAME,
     EMAIL: EMAIL,
     CONTACT_NO: CONTACT_NO,
+    USER_ID: USER_ID,
     COMPANY_ID: COMPANY_ID,
     COMPANY_NAME: COMPANY_NAME
 }

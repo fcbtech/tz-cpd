@@ -13,29 +13,26 @@ export const parseJwt = (token) => {
 };
 
 export const isJWTTokenValid = (tokenType) => {
-    console.log(tokenType)
     try {
         const token = getJWTTokenFromLocalStorage(tokenType);
         if (!token) return false;
         const extractedToken = parseJwt(token);
-        console.log('PARSED TOKEN: \n', extractedToken)
         const expirationTime = extractedToken.exp * 1000;
         const timediff = expirationTime - Date.now();
-        console.log("TOKEN EXPIRY: ", tokenType + ' --- ' + timediff)
         if (timediff <= 0) {
             return false;
         }
         return token;
     } catch (error) {
-        console.log(`Error in validating token ${tokenType}: ${error}`)
         removeJWTTokensToLocalStorage(tokenType)
+        console.log(`Error in validating token ${tokenType}: ${error}`)
         return false;
     }
 };
 
 export const getRefreshToken = async (refreshToken) => {
     try {
-        const fetchedTokenResponse = await axios.post("http://127.0.0.1:8001/main/login/api-token-refresh/", refreshToken);
+        const fetchedTokenResponse = await axios.post("https://be.letstranzact.com/main/login/api-token-refresh/", refreshToken);
         return fetchedTokenResponse.data[Constants.ACCESS_TOKEN];
     } catch (error) {
         console.log('Error in refreshing token: ', error)
@@ -43,4 +40,37 @@ export const getRefreshToken = async (refreshToken) => {
         localStorage.removeItem('refresh_token');
         return false;
     }
+}
+
+const fetchNewAccessToken = async (refreshToken) => {
+    try {
+        localStorage.removeItem('access_token');
+        let fetchedAccessToken = await getRefreshToken({ refresh_token: refreshToken });
+
+        if (fetchedAccessToken) {
+            setJWTTokensToLocalStorage('access_token', fetchedAccessToken)
+        } else {
+            removeJWTTokensToLocalStorage('refresh_token')
+            removeJWTTokensToLocalStorage('access_token')
+        }
+    } catch {
+        // localStorage.removeItem('refresh_token');
+        throw new Error('There was an error refreshing the token');
+    }
+};
+
+export const checkAuthentication = async () => {
+    const accessToken = isJWTTokenValid('access_token')
+    const refreshToken = isJWTTokenValid('refresh_token')
+
+    if (accessToken) {
+        return true;
+    }
+
+    if (refreshToken) {
+        await fetchNewAccessToken(refreshToken)
+        return true;
+    }
+
+    return false;
 }

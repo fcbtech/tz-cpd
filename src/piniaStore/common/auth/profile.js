@@ -9,11 +9,7 @@ export const useProfileStore = defineStore('profile', () => {
   const submitLoginAction = async (payload) => {
 
     try {
-      let response = await axios.post('http://127.0.0.1:8001/main/login/password-login/', payload)
-
-
-      console.log("Response: ", JSON.stringify(response));
-
+      let response = await axios.post('https://be.letstranzact.com/main/login/password-login/', payload)
       setUserDetails(response);
       return {
         message: response.data.message,
@@ -41,8 +37,6 @@ export const useProfileStore = defineStore('profile', () => {
   const redirectLoginUser = async (payload) => {
 
     let nextUrl = '/HomePage';
-
-    console.log("Redirecting login user: ", nextUrl);
     router.push(nextUrl)
   };
 
@@ -63,16 +57,18 @@ export const useProfileStore = defineStore('profile', () => {
       const email = parsedToken[Constants.EMAIL]
       const contactNo = parsedToken[Constants.CONTACT_NO]
       const companyName = parsedToken[Constants.COMPANY_NAME]
+      const userId = parsedToken[Constants.USER_ID]
       const companyId = parsedToken[Constants.COMPANY_ID]
       localStorage.setItem(Constants.FIRST_NAME, firstName)
       localStorage.setItem(Constants.LAST_NAME, lastName)
       localStorage.setItem(Constants.EMAIL, email)
       localStorage.setItem(Constants.CONTACT_NO, contactNo)
       localStorage.setItem(Constants.COMPANY_NAME, companyName)
+      localStorage.setItem[Constants.USER_ID, userId]
       localStorage.setItem(Constants.COMPANY_ID, companyId)
 
     } catch (error) {
-      console.log(error)
+      console.log('Error in setting user details to localstorage: ', error)
     }
   }
 
@@ -82,6 +78,7 @@ export const useProfileStore = defineStore('profile', () => {
     localStorage.removeItem(Constants.EMAIL)
     localStorage.removeItem(Constants.CONTACT_NO)
     localStorage.removeItem(Constants.COMPANY_NAME)
+    localStorage.removeItem(Constants.USER_ID)
     localStorage.removeItem(Constants.COMPANY_ID)
   }
 
@@ -95,6 +92,10 @@ export const useProfileStore = defineStore('profile', () => {
 
   const getUserCompanyName = () => {
     return localStorage.getItem(Constants.COMPANY_NAME)
+  }
+
+  const getUserId = () => {
+    return localStorage.getItem(Constants.USER_ID)
   }
 
   return {

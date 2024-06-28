@@ -11,7 +11,8 @@
           <v-btn :ripple="false" class="text-none text-start" variant="plain" append-icon="mdi-chevron-down">
             {{ useProfileStore().getUserFirstName() + ' ' + useProfileStore().getUserLastName() }}
             <br>
-            {{ useProfileStore().getUserCompanyName() }}
+            <!-- {{ useProfileStore().getUserCompanyName() }} -->
+            {{ userType }}
             <!-- <v-menu class="pa-0" activator="parent" :open-on-hover="true" :open-delay="10" :close-delay="10"
               :open-on-click="false" :open-on-focus="false"> -->
             <v-menu class="pa-0" activator="parent">
@@ -33,4 +34,7 @@
 
 <script setup>
 import { useProfileStore } from "@/piniaStore/common/auth/profile";
+const props = defineProps({
+  userType: String
+})
 </script>
