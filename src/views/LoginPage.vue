@@ -11,7 +11,7 @@
     >
       <v-row>
         <v-col cols="12" class="d-flex justify-center">
-          <v-img :src="`img/Logo.svg`" max-width="250" max-height="60" />
+          <v-img :src="`https://tz-public-data.s3.ap-south-1.amazonaws.com/tz-cpd-img/Logo.svg`" max-width="250" max-height="60" />
         </v-col>
         <v-col cols="12" class="d-flex justify-center px-0 pt-0">
           <div class="text-caption text-center">
