@@ -1,15 +1,12 @@
 <template>
   <div>
     <div>
-      <NavBar :userType="userType" />
+      <NavBar :userType="userType" :showAllotDataBtn="fetchedProspects.length === 0 && !isLoading" @allotData="initialize(1)" @uploadData="dialogUpload=true"/>
     </div>
     <v-snackbar class="text-center" location="bottom center" v-model="snackbar" :timeout="timeout" :color="snackbarColor">
       {{  snackbarMessage }}
     </v-snackbar>
-    <v-btn v-if="fetchedProspects.length === 0 && !isLoading" class="allot-data-btn" color="primary" @click="initialize(1)">
-      Allot Data
-    </v-btn>
-      <div :style="[ isLoading ? {'margin-top' : '100px', 'filter' : 'blur(2px)' } : { 'margin-top' : '100px' }]">
+      <div :style="[ isLoading ? {'margin-top' : '64px', 'filter' : 'blur(2px)' } : { 'margin-top' : '64px' }]">
       <Loader :loading='isLoading'/>
       <v-data-table :row-props="rowBackground" hover fixed-header height="500" density="compact" item-key="name" :search="search" :headers="headers" :items="filteredData" :sort-by="[{ key: 'company_name', order: 'asc' }]">
         <template
@@ -125,8 +122,7 @@
                 </v-card-title>
 
                 <v-card-text>
-                  <v-file-input @change="handleFileUpload" accept=".xlsx" :rules="rules"  label="Upload excel file"
-                    placeholder="Pick AYUSHSHHH" prepend-icon="mdi-camera"></v-file-input>
+                  <v-file-input @change="handleFileUpload" accept=".xlsx" :rules="rules"  label="Upload excel file" prepend-icon="mdi-file"/>
                 </v-card-text>
 
                 <v-card-actions>
@@ -177,9 +173,10 @@
 <script>
 import axios from 'axios';
 import { checkAuthentication, getJWTTokenFromLocalStorage } from '@/utils/authentication'
+import { DEAL_SUB_SOURCE, CLUSTER_AREA } from '@/utils/constants'
 import router from '@/router'
 import * as XLSX from 'xlsx';
-
+import { validateClusterLeads } from '@/utils/validations'
 
 export default {
   data: () => ({
@@ -254,6 +251,8 @@ export default {
     editedItem: {},
     defaultItem: {},
     uploadedExcelFile: null,
+    invalidItems: [],
+    validItems: [],
     apiResponse: [
       // Example API response data structure
       { rowNumber: 2, invalidMessage: 'Invalid email address' },
@@ -555,11 +554,13 @@ export default {
     },
 
     async uploadExcel() {
+      this.isLoading = true
       //TODO: Trigger API for adding data to database and 
       //get the data for fields not added
       this.closeUpload();
-
-
+      
+      const { validItems, invalidItems } = validateClusterLeads(this.uploadedFile)
+      this.invalidItems = invalidItems
       try {
         const isAuthenticated = await checkAuthentication()
         if(!isAuthenticated) {
@@ -578,16 +579,18 @@ export default {
         // const formData = new FormData();
         // formData.append('excelFile', this.uploadedFile);
         // const payload = formData
-        const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", this.uploadedFile, config);
+        const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", validItems, config);
         // const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd-api/tz-cpd/bulk-insert", config);
         this.apiResponse = fetchedTokenResponse.data.data
         if(fetchedTokenResponse.data.code === 'insert_partial') {
           this.downloadErrorExcel()
         }
       } catch(error) {
-
         this.snackbar = true
-
+        this.invalidItems = this.invalidItems.concat(this.apiResponse)
+      }
+      finally {
+        this.isLoading = false
       }
 
       this.uploadedFile = []

@@ -7,6 +7,12 @@
             alt="Logo" />
         </v-col>
         <v-col class="d-flex justify-end">
+          <v-btn v-if="userType==='Cluster Team'" class="mx-2 btn-color" color="primary" @click="$emit('uploadData')">
+            Upload Data
+          </v-btn>
+          <v-btn v-if="showAllotDataBtn" color="primary" class="btn-color mx-2 px-1" @click="$emit('allotData')">
+            Allot Data
+          </v-btn>
           <v-img src="@/assets/navbarCompanyLogo.svg" :max-height="40" :max-width="40" />
           <v-btn :ripple="false" class="text-none text-start" variant="plain" append-icon="mdi-chevron-down">
             {{ useProfileStore().getUserFirstName() + ' ' + useProfileStore().getUserLastName() }}
@@ -35,6 +41,14 @@
 <script setup>
 import { useProfileStore } from "@/piniaStore/common/auth/profile";
 const props = defineProps({
-  userType: String
+  userType: String,
+  showAllotDataBtn: Boolean
 })
 </script>
+
+<style scoped>
+.btn-color {
+  background-color: #1976d2 !important;
+  color: #fff !important;
+}
+</style>
