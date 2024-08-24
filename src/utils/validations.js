@@ -4,7 +4,30 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const validateClusterLeads = (uploadedClusterData) => {
   const validItems = [];
+  const gstinMap = new Map();
+  const pocContactMap = new Map();
   const invalidItems = [];
+
+  uploadedClusterData.forEach((item, index) => {
+    const gstin = item.gstin?.trim();
+    const pocContact = item.poc_contact?.trim();
+
+    if (gstin) {
+      if (!gstinMap.has(gstin)) {
+        gstinMap.set(gstin, [index]);
+      } else {
+        gstinMap.get(gstin).push(index);
+      }
+    }
+
+    if (pocContact) {
+      if (!pocContactMap.has(pocContact)) {
+        pocContactMap.set(pocContact, [index]);
+      } else {
+        pocContactMap.get(pocContact).push(index);
+      }
+    }
+  });
   for (const item of uploadedClusterData) {
     const errorMesage = "";
     if (!!item.company_name || item.company_name.trim().length === 0) {
@@ -41,6 +64,15 @@ export const validateClusterLeads = (uploadedClusterData) => {
       if (!emailRegex.test(item.poc_email)) {
         errorMesage += "Invalid POC email format | ";
       }
+    }
+    if (item.gstin && gstinMap.get(item.gstin.trim()).length > 1) {
+      errorMesage += "Duplicate GSTIN found | ";
+    }
+    if (
+      item.poc_contact &&
+      pocContactMap.get(item.poc_contact.trim()).length > 1
+    ) {
+      errorMesage += "Duplicate POC contact found | ";
     }
 
     if (errorMesage.length > 0) {
