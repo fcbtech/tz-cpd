@@ -1,4 +1,4 @@
-import { DEAL_SUB_SOURCE, CLUSTER_AREA } from "@/constants";
+import { DEAL_SUB_SOURCE, CLUSTER_AREA } from "./constants";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
