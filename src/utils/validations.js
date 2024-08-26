@@ -32,7 +32,7 @@ export const validateClusterLeads = (uploadedClusterData) => {
     }
   });
   for (const item of uploadedClusterData) {
-    const errorMesage = "";
+    let errorMesage = "";
     if (!!item.company_name || item.company_name.trim().length === 0) {
       errorMesage += "Company name is required | ";
     }
