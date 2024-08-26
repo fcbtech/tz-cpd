@@ -10,7 +10,10 @@ export const validateClusterLeads = (uploadedClusterData) => {
 
   uploadedClusterData.forEach((item, index) => {
     const gstin = item.gstin?.trim();
-    const pocContact = item.poc_contact?.trim();
+    const pocContact =
+      typeof item.poc_contact === "string"
+        ? item.poc_contact.trim()
+        : item.poc_contact;
 
     if (gstin) {
       if (!gstinMap.has(gstin)) {
