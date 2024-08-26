@@ -9,7 +9,7 @@ export const validateClusterLeads = (uploadedClusterData) => {
   const invalidItems = [];
 
   uploadedClusterData.forEach((item, index) => {
-    const gstin = item.gstin?.trim();
+    const gstin = item.gstin?.trim() || "";
     const pocContact =
       typeof item.poc_contact === "string"
         ? item.poc_contact.trim()
@@ -37,46 +37,53 @@ export const validateClusterLeads = (uploadedClusterData) => {
         ? item.poc_contact.trim()
         : String(item.poc_contact).trim();
 
+    const gstin = item.gstin?.trim() || "";
+    const pocContact = item.poc_contact?.trim() || "";
+    const pocName = item.poc_name?.trim() || "";
+    const pocEmail = item.poc_email?.trim() || "";
+    const clusterArea = item.cluster_area?.trim() || "";
+    const dealSubSource = item.deal_sub_source?.trim() || "";
+    const companyName = item.company_name?.trim() || "";
+
     let errorMesage = "";
-    if (!!item.company_name || item.company_name.trim().length === 0) {
+    if (!!companyName || companyName.trim().length === 0) {
       errorMesage += "Company name is required | ";
     }
     if (
       !!item.deal_sub_source ||
       item.deal_sub_source.trim().length === 0 ||
-      !DEAL_SUB_SOURCE.includes(item.deal_sub_source)
+      !DEAL_SUB_SOURCE.includes(dealSubSource)
     ) {
       errorMesage += "Deal sub source is required | ";
     }
-    if (
-      !!item.gstin ||
-      item.gstin.trim().length === 0 ||
-      item.gstin.length !== 15
-    ) {
+    if (!!gstin || gstin.trim().length === 0 || gstin.length !== 15) {
       errorMesage += "GSTIN is required | ";
     }
     if (
-      !!pocContactNumber ||
-      pocContactNumber.trim().length === 0 ||
-      pocContactNumber.length !== 10
+      !!pocContact ||
+      pocContact.trim().length === 0 ||
+      pocContact.length !== 10
     ) {
       errorMesage += "POC contact is required | ";
     }
-    if (!!item.poc_name || item.poc_name.trim().length === 0) {
+    if (!!pocName || pocName.trim().length === 0) {
       errorMesage += "POC name is required | ";
     }
-    if (item.cluster_area && !CLUSTER_AREA.includes(item.cluster_area.trim())) {
+    if (!!clusterArea && !CLUSTER_AREA.includes(clusterArea.trim())) {
       errorMesage += "Invalid Cluster area | ";
     }
-    if (item.poc_email && item.poc_email.trim().length > 0) {
-      if (!emailRegex.test(item.poc_email)) {
+    if (!!pocEmail && pocEmail.trim().length > 0) {
+      if (!emailRegex.test(pocEmail)) {
         errorMesage += "Invalid POC email format | ";
       }
     }
-    if (item.gstin && gstinMap.get(item.gstin.trim()).length > 1) {
+    if (gstin && gstinMap.get(gstin.trim()).length > 1) {
       errorMesage += "Duplicate GSTIN found | ";
     }
-    if (item.poc_contact && pocContactMap.get(pocContactNumber).length > 1) {
+    if (
+      pocContactNumber &&
+      pocContactMap.get(pocContactNumber.trim()).length > 1
+    ) {
       errorMesage += "Duplicate POC contact found | ";
     }
 
