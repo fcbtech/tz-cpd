@@ -38,7 +38,6 @@ export const validateClusterLeads = (uploadedClusterData) => {
         : String(item.poc_contact).trim();
 
     const gstin = item.gstin?.trim() || "";
-    const pocContact = item.poc_contact?.trim() || "";
     const pocName = item.poc_name?.trim() || "";
     const pocEmail = item.poc_email?.trim() || "";
     const clusterArea = item.cluster_area?.trim() || "";
@@ -60,9 +59,9 @@ export const validateClusterLeads = (uploadedClusterData) => {
       errorMesage += "GSTIN is required | ";
     }
     if (
-      !!pocContact ||
-      pocContact.trim().length === 0 ||
-      pocContact.length !== 10
+      !!pocContactNumber ||
+      pocContactNumber.trim().length === 0 ||
+      pocContactNumber.length !== 10
     ) {
       errorMesage += "POC contact is required | ";
     }
