@@ -13,7 +13,7 @@ export const validateClusterLeads = (uploadedClusterData) => {
     const pocContact =
       typeof item.poc_contact === "string"
         ? item.poc_contact.trim()
-        : item.poc_contact;
+        : String(item.poc_contact).trim();
 
     if (gstin) {
       if (!gstinMap.has(gstin)) {
@@ -32,6 +32,11 @@ export const validateClusterLeads = (uploadedClusterData) => {
     }
   });
   for (const item of uploadedClusterData) {
+    const pocContactNumber =
+      typeof item.poc_contact === "string"
+        ? item.poc_contact.trim()
+        : String(item.poc_contact).trim();
+
     let errorMesage = "";
     if (!!item.company_name || item.company_name.trim().length === 0) {
       errorMesage += "Company name is required | ";
@@ -51,9 +56,9 @@ export const validateClusterLeads = (uploadedClusterData) => {
       errorMesage += "GSTIN is required | ";
     }
     if (
-      !!item.poc_contact ||
-      item.poc_contact.trim().length === 0 ||
-      item.poc_contact.length !== 10
+      !!pocContactNumber ||
+      pocContactNumber.trim().length === 0 ||
+      pocContactNumber.length !== 10
     ) {
       errorMesage += "POC contact is required | ";
     }
@@ -71,10 +76,7 @@ export const validateClusterLeads = (uploadedClusterData) => {
     if (item.gstin && gstinMap.get(item.gstin.trim()).length > 1) {
       errorMesage += "Duplicate GSTIN found | ";
     }
-    if (
-      item.poc_contact &&
-      pocContactMap.get(item.poc_contact.trim()).length > 1
-    ) {
+    if (item.poc_contact && pocContactMap.get(pocContactNumber).length > 1) {
       errorMesage += "Duplicate POC contact found | ";
     }
 
