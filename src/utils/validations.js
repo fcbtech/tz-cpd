@@ -49,8 +49,8 @@ export const validateClusterLeads = (uploadedClusterData) => {
       errorMesage += "Company name is required | ";
     }
     if (
-      !!item.deal_sub_source ||
-      item.deal_sub_source.trim().length === 0 ||
+      !!dealSubSource ||
+      dealSubSource.trim().length === 0 ||
       !DEAL_SUB_SOURCE.includes(dealSubSource)
     ) {
       errorMesage += "Deal sub source is required | ";
