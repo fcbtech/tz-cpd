@@ -582,12 +582,9 @@ export default {
         const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", validItems, config);
         // const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd-api/tz-cpd/bulk-insert", config);
         this.apiResponse = fetchedTokenResponse.data.data
-        if(fetchedTokenResponse.data.code === 'insert_partial') {
-          this.downloadErrorExcel()
-        }
+        this.invalidItems = this.invalidItems.concat(this.apiResponse)
       } catch(error) {
         this.snackbar = true
-        this.invalidItems = this.invalidItems.concat(this.apiResponse)
       }
       finally {
         this.isLoading = false
@@ -600,48 +597,26 @@ export default {
     },
 
     async downloadErrorExcel () {
-      const reader = new FileReader();
+      // Convert invalidItems to worksheet
+      const worksheet = XLSX.utils.json_to_sheet(this.invalidItems);
 
-      reader.onload = (e) => {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
+      // Create a new workbook and add the worksheet
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Invalid Items");
 
-        // Convert the worksheet to JSON for easier manipulation
-        const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      // Generate Excel file
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
 
-        // Add new columns headers if they don't exist
-        if (sheetData[0].indexOf('invalid') === -1) {
-          sheetData[0].push('invalid', 'invalidMessage');
-        }
+      // Create Blob and download
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'invalid_items.xlsx';
+      link.click();
 
-        // Add invalid and invalidMessage to the corresponding rows
-        this.apiResponse.forEach(({ rowNumber, invalidMessage }) => {
-          if (sheetData[rowNumber]) {
-            // Ensure the row has enough columns to accommodate new data
-            sheetData[rowNumber][sheetData[0].length - 2] = 'true';
-            sheetData[rowNumber][sheetData[0].length - 1] = invalidMessage;
-          }
-        });
-
-        // Convert the updated JSON back to worksheet
-        const updatedWorksheet = XLSX.utils.aoa_to_sheet(sheetData);
-
-        // Update the worksheet in the workbook
-        workbook.Sheets[firstSheetName] = updatedWorksheet;
-
-        // Create a new Excel file and trigger download
-        const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
-        const blob = new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' });
-
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'updated_file.xlsx';
-        link.click();
-      };
-
-      reader.readAsArrayBuffer(this.uploadedExcelFile);
+      // Clean up
+      URL.revokeObjectURL(url);
     },
 
     s2ab(s) {

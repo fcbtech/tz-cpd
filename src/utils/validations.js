@@ -10,10 +10,11 @@ export const validateClusterLeads = (uploadedClusterData) => {
 
   uploadedClusterData.forEach((item, index) => {
     const gstin = item.gstin?.trim() || "";
-    const pocContact =
-      typeof item.poc_contact === "string"
+    const pocContact = item.poc_contact
+      ? typeof item.poc_contact === "string"
         ? item.poc_contact.trim()
-        : String(item.poc_contact).trim();
+        : String(item.poc_contact).trim()
+      : "";
 
     if (gstin) {
       if (!gstinMap.has(gstin)) {
@@ -32,10 +33,11 @@ export const validateClusterLeads = (uploadedClusterData) => {
     }
   });
   for (const item of uploadedClusterData) {
-    const pocContactNumber =
-      typeof item.poc_contact === "string"
+    const pocContactNumber = item.poc_contact
+      ? typeof item.poc_contact === "string"
         ? item.poc_contact.trim()
-        : String(item.poc_contact).trim();
+        : String(item.poc_contact).trim()
+      : "";
 
     const gstin = item.gstin?.trim() || "";
     const pocName = item.poc_name?.trim() || "";
@@ -45,44 +47,31 @@ export const validateClusterLeads = (uploadedClusterData) => {
     const companyName = item.company_name?.trim() || "";
 
     let errorMesage = "";
-    if (!!companyName || companyName.trim().length === 0) {
+    if (!companyName) {
       errorMesage += "Company name is required | ";
     }
-    if (
-      !!dealSubSource ||
-      dealSubSource.trim().length === 0 ||
-      !DEAL_SUB_SOURCE.includes(dealSubSource)
-    ) {
-      errorMesage += "Deal sub source is required | ";
+    if (!dealSubSource || !DEAL_SUB_SOURCE.includes(dealSubSource)) {
+      errorMesage += "Invalid Deal sub source | ";
     }
-    if (!!gstin || gstin.trim().length === 0 || gstin.length !== 15) {
+    if (!gstin || gstin.length !== 15) {
       errorMesage += "GSTIN is required | ";
     }
-    if (
-      !!pocContactNumber ||
-      pocContactNumber.trim().length === 0 ||
-      pocContactNumber.length !== 10
-    ) {
-      errorMesage += "POC contact is required | ";
+    if (!pocContactNumber || pocContactNumber.length !== 10) {
+      errorMesage += "Invalid POC contact | ";
     }
-    if (!!pocName || pocName.trim().length === 0) {
+    if (!pocName || pocName.length === 0) {
       errorMesage += "POC name is required | ";
     }
-    if (!!clusterArea && !CLUSTER_AREA.includes(clusterArea.trim())) {
+    if (clusterArea && !CLUSTER_AREA.includes(clusterArea)) {
       errorMesage += "Invalid Cluster area | ";
     }
-    if (!!pocEmail && pocEmail.trim().length > 0) {
-      if (!emailRegex.test(pocEmail)) {
-        errorMesage += "Invalid POC email format | ";
-      }
+    if (pocEmail && pocEmail.length > 0 && !emailRegex.test(pocEmail)) {
+      errorMesage += "Invalid POC email format | ";
     }
-    if (gstin && gstinMap.get(gstin.trim()).length > 1) {
+    if (gstin && gstinMap.get(gstin).length > 1) {
       errorMesage += "Duplicate GSTIN found | ";
     }
-    if (
-      pocContactNumber &&
-      pocContactMap.get(pocContactNumber.trim()).length > 1
-    ) {
+    if (pocContactNumber && pocContactMap.get(pocContactNumber).length > 1) {
       errorMesage += "Duplicate POC contact found | ";
     }
 
