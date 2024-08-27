@@ -591,6 +591,9 @@ export default {
       }
       finally {
         this.isLoading = false
+        if(this.invalidItems.length > 0) {
+          this.downloadErrorExcel()
+        }
       }
 
       this.uploadedFile = []
