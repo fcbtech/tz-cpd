@@ -30,11 +30,7 @@ export const DEAL_SUB_SOURCE = [
   'Inbound - Others'
 ]
 
-export const CLUSTER_AREA = [
-  'Nashik',
-  'Vadodara',
-  'Coimbatore',
-]
+export const CLUSTER_AREA = []
 
 
 export default {
