@@ -53,8 +53,11 @@ export const validateClusterLeads = (uploadedClusterData) => {
     if (!dealSubSource || !DEAL_SUB_SOURCE.includes(dealSubSource)) {
       errorMesage += "Invalid Deal sub source | ";
     }
-    if (!gstin || gstin.length !== 15) {
+    if (!gstin) {
       errorMesage += "GSTIN is required | ";
+    }
+    if (gstin && gstin.length !== 15) {
+      errorMesage += "GSTIN must be 15 characters | ";
     }
     if (!pocContactNumber || pocContactNumber.length !== 10) {
       errorMesage += "Invalid POC contact | ";
