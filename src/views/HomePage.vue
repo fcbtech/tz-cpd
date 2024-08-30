@@ -126,6 +126,9 @@
                 </v-card-text>
 
                 <v-card-actions>
+                  <v-btn color="blue-darken-1" variant="text" @click="downloadTemplate">
+                    Download Template
+                  </v-btn>
                   <v-spacer></v-spacer>
                   <v-btn color="blue-darken-1" variant="text" @click="closeUpload">
                     Cancel
@@ -612,7 +615,7 @@ export default {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'invalid_items.xlsx';
+      link.download = 'invalid_leads.xlsx';
       link.click();
 
       // Clean up
@@ -718,6 +721,10 @@ export default {
       const date = new Date(dateStamp)
       const dateString = date.toString().split(' ')
       return dateString[2] + ' ' + dateString[1] + ' ' + dateString[3] + '(' + dateString[4] + ')'
+    },
+
+    downloadTemplate() {
+      window.open('https://tz-public-data.s3.ap-south-1.amazonaws.com/images/tz-cpd.xlsx', '_blank');
     }
   },
 }
