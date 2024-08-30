@@ -1,15 +1,12 @@
 <template>
   <div>
     <div>
-      <NavBar :userType="userType" />
+      <NavBar :userType="userType" :showAllotDataBtn="fetchedProspects.length === 0 && !isLoading" @allotData="initialize(1)" @uploadData="dialogUpload=true"/>
     </div>
     <v-snackbar class="text-center" location="bottom center" v-model="snackbar" :timeout="timeout" :color="snackbarColor">
       {{  snackbarMessage }}
     </v-snackbar>
-    <v-btn v-if="fetchedProspects.length === 0 && !isLoading" class="allot-data-btn" color="primary" @click="initialize(1)">
-      Allot Data
-    </v-btn>
-      <div :style="[ isLoading ? {'margin-top' : '100px', 'filter' : 'blur(2px)' } : { 'margin-top' : '100px' }]">
+      <div :style="[ isLoading ? {'margin-top' : '64px', 'filter' : 'blur(2px)' } : { 'margin-top' : '64px' }]">
       <Loader :loading='isLoading'/>
       <v-data-table :row-props="rowBackground" hover fixed-header height="500" density="compact" item-key="name" :search="search" :headers="headers" :items="filteredData" :sort-by="[{ key: 'company_name', order: 'asc' }]">
         <template
@@ -125,11 +122,13 @@
                 </v-card-title>
 
                 <v-card-text>
-                  <v-file-input @change="handleFileUpload" accept=".xlsx" :rules="rules"  label="Upload excel file"
-                    placeholder="Pick AYUSHSHHH" prepend-icon="mdi-camera"></v-file-input>
+                  <v-file-input @change="handleFileUpload" accept=".xlsx" :rules="rules"  label="Upload excel file" prepend-icon="mdi-file"/>
                 </v-card-text>
 
                 <v-card-actions>
+                  <v-btn color="blue-darken-1" variant="text" @click="downloadTemplate">
+                    Download Template
+                  </v-btn>
                   <v-spacer></v-spacer>
                   <v-btn color="blue-darken-1" variant="text" @click="closeUpload">
                     Cancel
@@ -177,9 +176,10 @@
 <script>
 import axios from 'axios';
 import { checkAuthentication, getJWTTokenFromLocalStorage } from '@/utils/authentication'
+import { DEAL_SUB_SOURCE, CLUSTER_AREA } from '@/utils/constants'
 import router from '@/router'
 import * as XLSX from 'xlsx';
-
+import { validateClusterLeads } from '@/utils/validations'
 
 export default {
   data: () => ({
@@ -254,6 +254,8 @@ export default {
     editedItem: {},
     defaultItem: {},
     uploadedExcelFile: null,
+    invalidItems: [],
+    validItems: [],
     apiResponse: [
       // Example API response data structure
       { rowNumber: 2, invalidMessage: 'Invalid email address' },
@@ -555,11 +557,13 @@ export default {
     },
 
     async uploadExcel() {
+      this.isLoading = true
       //TODO: Trigger API for adding data to database and 
       //get the data for fields not added
       this.closeUpload();
-
-
+      
+      const { validItems, invalidItems } = validateClusterLeads(this.uploadedFile)
+      this.invalidItems = invalidItems
       try {
         const isAuthenticated = await checkAuthentication()
         if(!isAuthenticated) {
@@ -578,64 +582,44 @@ export default {
         // const formData = new FormData();
         // formData.append('excelFile', this.uploadedFile);
         // const payload = formData
-        const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", this.uploadedFile, config);
+        const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", validItems, config);
         // const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd-api/tz-cpd/bulk-insert", config);
         this.apiResponse = fetchedTokenResponse.data.data
-        if(fetchedTokenResponse.data.code === 'insert_partial') {
+        this.invalidItems = this.invalidItems.concat(this.apiResponse)
+      } catch(error) {
+        this.snackbar = true
+      }
+      finally {
+        this.isLoading = false
+        if(this.invalidItems.length > 0) {
           this.downloadErrorExcel()
         }
-      } catch(error) {
-
-        this.snackbar = true
-
       }
 
       this.uploadedFile = []
     },
 
     async downloadErrorExcel () {
-      const reader = new FileReader();
+      // Convert invalidItems to worksheet
+      const worksheet = XLSX.utils.json_to_sheet(this.invalidItems);
 
-      reader.onload = (e) => {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
+      // Create a new workbook and add the worksheet
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Invalid Items");
 
-        // Convert the worksheet to JSON for easier manipulation
-        const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      // Generate Excel file
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
 
-        // Add new columns headers if they don't exist
-        if (sheetData[0].indexOf('invalid') === -1) {
-          sheetData[0].push('invalid', 'invalidMessage');
-        }
+      // Create Blob and download
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'invalid_leads.xlsx';
+      link.click();
 
-        // Add invalid and invalidMessage to the corresponding rows
-        this.apiResponse.forEach(({ rowNumber, invalidMessage }) => {
-          if (sheetData[rowNumber]) {
-            // Ensure the row has enough columns to accommodate new data
-            sheetData[rowNumber][sheetData[0].length - 2] = 'true';
-            sheetData[rowNumber][sheetData[0].length - 1] = invalidMessage;
-          }
-        });
-
-        // Convert the updated JSON back to worksheet
-        const updatedWorksheet = XLSX.utils.aoa_to_sheet(sheetData);
-
-        // Update the worksheet in the workbook
-        workbook.Sheets[firstSheetName] = updatedWorksheet;
-
-        // Create a new Excel file and trigger download
-        const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
-        const blob = new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' });
-
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'updated_file.xlsx';
-        link.click();
-      };
-
-      reader.readAsArrayBuffer(this.uploadedExcelFile);
+      // Clean up
+      URL.revokeObjectURL(url);
     },
 
     s2ab(s) {
@@ -737,6 +721,10 @@ export default {
       const date = new Date(dateStamp)
       const dateString = date.toString().split(' ')
       return dateString[2] + ' ' + dateString[1] + ' ' + dateString[3] + '(' + dateString[4] + ')'
+    },
+
+    downloadTemplate() {
+      window.open('https://tz-public-data.s3.ap-south-1.amazonaws.com/images/tz-cpd.xlsx', '_blank');
     }
   },
 }

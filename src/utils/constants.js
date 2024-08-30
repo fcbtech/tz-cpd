@@ -8,6 +8,31 @@ const USER_ID = "user_id"
 const COMPANY_ID = 'company_id'
 const COMPANY_NAME = 'company_name'
 
+export const DEAL_SUB_SOURCE = [
+  'Association Directory',
+  'Sponsored Event',
+  'SME conclave',
+  'Reference',
+  'Already signedup Data',
+  'Sourced cold data',
+  'Lead from Digital',
+  'Others',
+  'Expo',
+  'Cold Walk In',
+  'E-invoice',
+  'Inbound - Billboard',
+  'Inbound - Newspaper', 
+  'Inbound - Association magazine',
+  'Inbound - TTD',
+  'Inbound - Customer network',
+  'Inbound - Expo',
+  'Inbound - Events',
+  'Inbound - Others'
+]
+
+export const CLUSTER_AREA = []
+
+
 export default {
     REFRESH_TOKEN: REFRESH_TOKEN,
     ACCESS_TOKEN: ACCESS_TOKEN,
@@ -17,5 +42,7 @@ export default {
     CONTACT_NO: CONTACT_NO,
     USER_ID: USER_ID,
     COMPANY_ID: COMPANY_ID,
-    COMPANY_NAME: COMPANY_NAME
+    COMPANY_NAME: COMPANY_NAME,
+    DEAL_SUB_SOURCE,
+    CLUSTER_AREA
 }
