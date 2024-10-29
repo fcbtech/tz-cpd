@@ -176,7 +176,6 @@
 <script>
 import axios from 'axios';
 import { checkAuthentication, getJWTTokenFromLocalStorage } from '@/utils/authentication'
-import { DEAL_SUB_SOURCE, CLUSTER_AREA } from '@/utils/constants'
 import router from '@/router'
 import * as XLSX from 'xlsx';
 import { validateClusterLeads } from '@/utils/validations'
@@ -583,7 +582,7 @@ export default {
         // formData.append('excelFile', this.uploadedFile);
         // const payload = formData
         const fetchedTokenResponse = await axios.post("https://asia-south1-tranzact-production.cloudfunctions.net/tz-cpd-api/tz-cpd/bulk-insert", validItems, config);
-        // const fetchedTokenResponse = await axios.get("http://localhost:56777/tz-cpd-api/tz-cpd/bulk-insert", config);
+        // const fetchedTokenResponse = await axios.post("http://localhost:56777/tz-cpd/bulk-insert", validItems, config);
         this.apiResponse = fetchedTokenResponse.data.data
         this.invalidItems = this.invalidItems.concat(this.apiResponse)
       } catch(error) {
