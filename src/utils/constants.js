@@ -30,9 +30,6 @@ export const DEAL_SUB_SOURCE = [
   'Inbound - Others'
 ]
 
-export const CLUSTER_AREA = []
-
-
 export default {
     REFRESH_TOKEN: REFRESH_TOKEN,
     ACCESS_TOKEN: ACCESS_TOKEN,
@@ -43,6 +40,5 @@ export default {
     USER_ID: USER_ID,
     COMPANY_ID: COMPANY_ID,
     COMPANY_NAME: COMPANY_NAME,
-    DEAL_SUB_SOURCE,
-    CLUSTER_AREA
+    DEAL_SUB_SOURCE
 }
