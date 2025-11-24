@@ -1,4 +1,4 @@
-import { DEAL_SUB_SOURCE } from "./constants";
+import { DEAL_SUB_SOURCE, CLUSTER_NAME, DESIGNATION, AGENT_OR_OS_LEAD } from "./constants";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -49,14 +49,18 @@ export const validateClusterLeads = (uploadedClusterData) => {
     const pocName = item.poc_name?.trim() || "";
     const pocEmail = item.poc_email?.trim() || "";
     const dealSubSource = item.deal_sub_source?.trim() || "";
-    const companyName = item.company_name?.trim() || "";
+    const dealname = item.company_name?.trim() || "";
     const address = item.address?.trim() || "";
     const manufactured_product = item.manufactured_product?.trim() || "";
     const website_link = item.website_link?.trim() || "";
     const indiamart_link = item.indiamart_link?.trim() || "";
+    const designation = item.designation?.trim() || "";
+    const clusterName = item.cluster_name?.trim() || "";
+    const is_manufacturing = item.is_manufacturing?.trim() || "";
+    const agent_or_os_lead = item.agent_or_os_lead?.trim() || "";
 
     let errorMesage = "";
-    if (!companyName) {
+    if (!dealname) {
       errorMesage += "Company name is required | ";
     }
     if (!dealSubSource || !DEAL_SUB_SOURCE.includes(dealSubSource)) {
@@ -68,7 +72,7 @@ export const validateClusterLeads = (uploadedClusterData) => {
     if (gstin && gstin.length !== 15) {
       errorMesage += "GSTIN must be 15 characters | ";
     }
-    if (!pocContactNumber || pocContactNumber.length !== 10) {
+    if (pocContactNumber && pocContactNumber.length !== 10) {
       errorMesage += "Invalid POC contact | ";
     }
     if (!pocName || pocName.length === 0) {
@@ -94,6 +98,18 @@ export const validateClusterLeads = (uploadedClusterData) => {
     }
     if (pocContactNumber && pocContactMap.has(pocContactNumber) && pocContactMap.get(pocContactNumber).length > 1) {
       errorMesage += "Duplicate POC contact found | ";
+    }
+    if(!designation || !DESIGNATION.includes(designation)) {
+      errorMesage += "Invalid Designation | ";
+    }
+    if(!clusterName || !CLUSTER_NAME.includes(clusterName)) {
+      errorMesage += "Invalid Cluster Name";
+    }
+    if(!is_manufacturing || is_manufacturing.toLowerCase() !== "yes") {
+      errorMesage += "Invalid is_manufacturing | ";
+    }
+    if(!agent_or_os_lead || !AGENT_OR_OS_LEAD.includes(agent_or_os_lead)) {
+      errorMesage += "Invalid agent_or_os_lead";
     }
 
     if (errorMesage.length > 0) {
