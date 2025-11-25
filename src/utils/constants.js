@@ -12,7 +12,7 @@ export const DEAL_SUB_SOURCE = [
   'Association Directory',
   'Sponsored Event',
   'SME conclave',
-  'Reference',
+  // 'Reference',
   'Already signedup Data',
   'Sourced cold data',
   'Lead from Digital',
@@ -30,6 +30,20 @@ export const DEAL_SUB_SOURCE = [
   'Inbound - Others'
 ]
 
+export const CLUSTER_NAME = [
+  'Baroda',
+  'Baroda M2 (Anand)',
+  'Baroda M2 (Ankleshwar)'
+]
+
+export const DESIGNATION = [
+  'Owner',
+  'HOD',
+  'Other'
+]
+
+export const AGENT_OR_OS_LEAD = ['Agent_Lead', 'OS_Lead']
+
 export default {
     REFRESH_TOKEN: REFRESH_TOKEN,
     ACCESS_TOKEN: ACCESS_TOKEN,
@@ -40,5 +54,8 @@ export default {
     USER_ID: USER_ID,
     COMPANY_ID: COMPANY_ID,
     COMPANY_NAME: COMPANY_NAME,
-    DEAL_SUB_SOURCE
+    DEAL_SUB_SOURCE,
+    CLUSTER_NAME,
+    DESIGNATION,
+    AGENT_OR_OS_LEAD
 }
